@@ -5,4 +5,6 @@ print("Its one L :>")
 print(" :(((")
 print("I'm sorry")
 
-Print("UNACCEPTABLE!!!!!!!!!!!!!!!!!")
+print("UNACCEPTABLE!!!!!!!!!!!!!!!!!")
+
+print("Any ideas for a project?")
