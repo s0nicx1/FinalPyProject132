@@ -1,8 +1,10 @@
+"""So far it's just a screen. Doesn't update or anything."""
+
+
 # Import pygame
 import pygame
 # initialize the pygame module
 pygame.init()
-
 # constant variable for the window's Width and Height for the RPi
 SIZE = 800, 400
 # makes the window
@@ -28,5 +30,6 @@ def main():
                 run = False
                 # closes window
                 pygame.quit()
+
 # calls the main() function
 main()
