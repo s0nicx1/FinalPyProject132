@@ -72,8 +72,8 @@ def main():
     # boolean variable, if false, game closes
     run = True
     while run:
-        # sets frame rate, resets 60 times a second
-        clock.tick(60)
+        # sets frame rate, resets 35 times a second so RPi doesn't stutter
+        clock.tick(35)
         for event in pygame.event.get():
             # If user closes out the window
             if event.type == pygame.QUIT:
