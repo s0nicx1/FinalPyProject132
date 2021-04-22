@@ -13,6 +13,7 @@ that you are removing a file from the repository.
 - Colin 4/5
 """
 
+# To show items in folder: ls
 
 # To make a py file: touch INSERT_NAME.py
 # (after you've opened up Git Bash in the folder) 
