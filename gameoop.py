@@ -13,8 +13,6 @@ COLIN: But it also lacks:
 - A box to put it all in
 """
 
-
-
 # Import pygame
 import pygame
 
@@ -34,12 +32,6 @@ BUG1 = pygame.transform.scale(BUG1, (55, 40))
 # Grab image for background
 BG = pygame.image.load("space.jpg")
 
-#=====[ VARIABLES ]=====
-# Constant variable representing a movement speed of 5 pixels for the player sprite
-PIX = 5
-RED = (255, 0, 0)
-
-
 #=====[ CREATE WINDOW ]======
 # Constant variable for window's width (800) and height (400); RPi screen size
 SIZE = 800, 400
@@ -47,6 +39,11 @@ SIZE = 800, 400
 WIN = pygame.display.set_mode(SIZE)
 # Sets caption for upper left corner of window
 pygame.display.set_caption("Test")
+
+#=====[ VARIABLES ]=====
+# Constant variable representing a movement speed of 5 pixels for the player sprite
+PIX = 5
+RED = (255, 0, 0)
 
 #=====[ CLASSES AND FUNCTIONS ]=====
 #------[ PLAYER CLASS ]-------
@@ -73,7 +70,32 @@ class Bug1(pygame.sprite.Sprite):
         window.blit(self.image, (self.x, self.y))
 
     def mov(self):
-        pass
+        for i in range(self.health):
+            if self.x != 745 and self.y == 0:
+                print("x = {}".format(self.x))
+                print("y = {}".format(self.y))
+                self.x += 5
+            if self.x == 745 and self.y < 40:
+                print("x = {}".format(self.x))
+                print("y = {}".format(self.y))
+                self.y += 5
+            if self.x != 0 and self.y == 40:
+                print("x = {}".format(self.x))
+                print("y = {}".format(self.y))
+                self.x -= 5
+            if self.x == 0 and self.y < 80:
+                print("x = {}".format(self.x))
+                print("y = {}".format(self.y))
+                self.y += 5
+            if self.x < 745 and self.y == 80:
+                print("x = {}".format(self.x))
+                print("y = {}".format(self.y))
+                self.x += 5
+
+
+
+
+
 
 # Standalone function for the player's projectiles
 def projectiles(player_proj):
@@ -116,6 +138,7 @@ def main():
         if wave == 0:
             b1.draw(WIN)
             b1.mov()
+            """b1.move_down()"""
         # Updates the window
         pygame.display.update()
 
@@ -132,7 +155,7 @@ def main():
                 run = False
             # Player presses left control to fire (will be fixed with arcade GPIO)
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LCTRL:
+                if event.key == pygame.K_SPACE:
                     # print("FIRE!\n") COLIN: This was just to test to make sure the player was firing
 
                     # Projectile is set to be inside the player's x image and have a width of 5 and height of 5
