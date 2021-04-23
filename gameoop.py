@@ -1,3 +1,20 @@
+"""
+COLIN: So far this version of our project contains:
+- Player movement to the left and right
+- Function for the player firing red projectiles upwards
+- A player sprite
+- A type of enemy sprite
+COLIN: But it also lacks:
+- A main menu with game options
+- Player lives {and health?}
+- Enemy variations, movements, attacks, spawning, and health
+- Music for menu and game
+- Arcade button compatibility
+- A box to put it all in
+"""
+
+
+
 # Import pygame
 import pygame
 
@@ -20,6 +37,7 @@ BG = pygame.image.load("space.jpg")
 #=====[ VARIABLES ]=====
 # Constant variable representing a movement speed of 5 pixels for the player sprite
 PIX = 5
+RED = (255, 0, 0)
 
 
 #=====[ CREATE WINDOW ]======
@@ -57,11 +75,18 @@ class Bug1(pygame.sprite.Sprite):
     def mov(self):
         pass
 
+# Standalone function for the player's projectiles
+def projectiles(player_proj):
+    # For every instance of a projectile added to the list of projectiles
+    for proj in player_proj:
+        # Send a projectile 7 pixels up
+        proj.y -= 7
+
 #=====[ MAIN GAME LOOP ]=====
-# Here is where the game is run.
-# It sets up the foundation of the pygame, then refers to several
+# COLIN: Here is where the game is run. It sets up the foundation of the pygame, then refers to several
 # classes and functions to display the pygame.
 def main():
+    player_proj = []
     # This is a counter for the amount of waves the player has gone through
     wave = 0
     # Run set to True so the game doesn't end
@@ -83,26 +108,46 @@ def main():
         # Refreshes the surfaces that pygame is displaying
         player.draw(WIN)
 
+        # For every instance of a projectile in the player's list of projectiles:
+        for proj in player_proj:
+            # draw it as a red rectangle
+            pygame.draw.rect(WIN, RED, proj)
+
         if wave == 0:
             b1.draw(WIN)
             b1.mov()
-
+        # Updates the window
         pygame.display.update()
 
     # Game loop for key controls
     while run:
         clock.tick(FPS)
+        # Calls the above display function to update the pygame's surfaces
+
         display()
         # Player closes window
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 # Run is set to False; main loop stops
                 run = False
+            # Player presses left control to fire (will be fixed with arcade GPIO)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LCTRL:
+                    # print("FIRE!\n") COLIN: This was just to test to make sure the player was firing
+
+                    # Projectile is set to be inside the player's x image and have a width of 5 and height of 5
+                    proj = pygame.Rect(player.x + 55 / 2, player.y, 5, 5)
+                    # Projectile is added to the player's list of projectiles
+                    player_proj.append(proj)
+
         keys_pressed = pygame.key.get_pressed()
         if keys_pressed[pygame.K_a] and player.x - PIX > 0:
             player.x -= PIX
         if keys_pressed[pygame.K_d] and player.x + PIX + 55 < 799:
             player.x += PIX
+
+        # Calls the projectiles function from the main loop
+        projectiles(player_proj)
 
 #=====[ LAUNCH GAME ]=====
 # Calls main loop
