@@ -72,29 +72,17 @@ class Bug1(pygame.sprite.Sprite):
     def mov(self):
         for i in range(self.health):
             if self.x != 745 and self.y == 0:
-                print("x = {}".format(self.x))
-                print("y = {}".format(self.y))
+                #print("x = {}".format(self.x))
+                #print("y = {}".format(self.y))
                 self.x += 5
             if self.x == 745 and self.y < 40:
-                print("x = {}".format(self.x))
-                print("y = {}".format(self.y))
                 self.y += 5
             if self.x != 0 and self.y == 40:
-                print("x = {}".format(self.x))
-                print("y = {}".format(self.y))
                 self.x -= 5
             if self.x == 0 and self.y < 80:
-                print("x = {}".format(self.x))
-                print("y = {}".format(self.y))
                 self.y += 5
             if self.x < 745 and self.y == 80:
-                print("x = {}".format(self.x))
-                print("y = {}".format(self.y))
                 self.x += 5
-
-
-
-
 
 
 # Standalone function for the player's projectiles
