@@ -31,6 +31,9 @@ COLIN: But it also lacks:
 - Moved sprite lists to the top of the game so they're predefined
 - Converted laserfire.mp3 to laserfire.wav. RPi didn't like it for some reason, but it accepted game_music.mp3. 
   As it should
+  
+4/27 Change Log:
+- Attempted to make enemies spawn in waves. not exactly what I wanted it to be. 
 """
 # Import pygame
 import pygame
