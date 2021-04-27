@@ -163,23 +163,43 @@ class BugT1(pygame.sprite.Sprite):
             if self.rect.x != 745 and self.rect.y == 0:
                 self.rect.x += 5
             # Go down
-            if self.rect.x == 745 and self.rect.y < 40:
+            if self.rect.x == 745 and 0 <= self.rect.y < 40:
                 self.rect.y += 5
             # Go left
             if self.rect.x != 0 and self.rect.y == 40:
                 self.rect.x -= 5
             # Go down
-            if self.rect.x == 0 and self.rect.y < 80:
+            if self.rect.x == 0 and 40 <= self.rect.y < 80:
                 self.rect.y += 5
             # Go right
             if self.rect.x != 745 and self.rect.y == 80:
                 self.rect.x += 5
             # Go down
-            if self.rect.x == 745 and self.rect.y < 120:
+            if self.rect.x == 745 and 80 <= self.rect.y < 120:
                 self.rect.y += 5
             # Go left
             if self.rect.x > 0 and self.rect.y == 120:
                 self.rect.x -= 5
+            # Go down
+            if self.rect.x == 0 and 120 <= self.rect.y < 160:
+                self.rect.y += 5
+            # Go right
+            if self.rect.x != 745 and self.rect.y == 160:
+                self.rect.x += 5
+            # Go down
+            if self.rect.x == 745 and 160 <= self.rect.y < 200:
+                self.rect.y += 5
+            # Go left
+            if self.rect.x > 0 and self.rect.y == 200:
+                self.rect.x -= 5
+            # Go down
+            if self.rect.x == 0 and 160 <= self.rect.y < 200:
+                self.rect.y += 5
+            # Go right
+            if self.rect.x != 745 and self.rect.y == 160:
+                self.rect.x += 5
+
+
 
         if (self.rect.x % 75 == 0):
             print("x = {}".format(self.rect.x))
@@ -193,8 +213,8 @@ class BugT1(pygame.sprite.Sprite):
             # Add laser to the Lasers group as it's made
             blasers.add(blaser)
 
-        """I think it'd be cool if we had a level where the bug type 1 just closed in the player at different y intervals
-        while showering down laserfire. You'd have to make it shoot in an infinite loop though"""
+    """I think it'd be cool if we had a level where the bug type 1 just closed in the player at different y intervals
+    while showering down laserfire. You'd have to make it shoot in an infinite loop though"""
 #-----[ BUG TYPE 1 LASER SPRITE CLASS ]-----
 class B1Laser(pygame.sprite.Sprite):
     def __init__(self):
