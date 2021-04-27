@@ -17,12 +17,20 @@ COLIN: But it also lacks:
 """
 4/26 Change Log: 
 - Added and currently am testing another bug type (BUG TYPE 2). It fires a laser at certain coordinates as it moves down
-  the screen.
+  the screen. After shooting for so long, it moves off screen (I'll look into despawning it later)
+- Bug Type 1 now fires lasers. It fires down whenever its coordinates can cleanly be modulated by 75 for a remainder of 0.
+  I think I should make it a constant variable that goes up with difficulty. But know that I think about it, if we spawn
+  multiples of those sprites, they'd be shooting in the exact same place. not very good at the start, but I guess it 
+  could be fun later on.
+- Extended Bug Type 1's moving commands. I really should see if there's an edge bounce thing with pygame 
 - Added Bugs' Laser class and collision with the player. I don't like the collision though
 - Made a health instance variable for the player. It cannot fire lasers after running out of health by getting hit 
   by laser fire. HOWEVER, if the player has more than 1 health, the sprite will automatically be removed by the 
   collision type, but still able to shoot lasers. I have to find a collision type that doesn't automatically remove the
-  targetted sprite (Unless it's bug type 1 of course. Those guys are small fries. 
+  targetted sprite (Unless it's bug type 1 of course. Those guys are small fries.)
+- Moved sprite lists to the top of the game so they're predefined
+- Converted laserfire.mp3 to laserfire.wav. RPi didn't like it for some reason, but it accepted game_music.mp3. 
+  As it should
 """
 # Import pygame
 import pygame
