@@ -44,7 +44,7 @@ BUG1 = pygame.transform.scale(BUG1, (55, 40))
 
 # Grabs and adjusts second bug type
 BUG2 = pygame.image.load("b2.png")
-BUG2 = pygame.transform.scale(BUG2, (55,80))
+BUG2 = pygame.transform.scale(BUG2, (65, 80))
 
 # Grab image for background
 BG = pygame.image.load("space.jpg")
@@ -53,7 +53,7 @@ BG = pygame.image.load("space.jpg")
 MUSIC = pygame.mixer.music.load("game_music.mp3")
 
 # Grabs sound for laser fire
-FIRE = pygame.mixer.Sound("laserfire.mp3")
+FIRE = pygame.mixer.Sound("laserfire.wav")
 
 #=====[ CREATE WINDOW ]======
 # Constant variable for window's width (800) and height (400); RPi screen size
@@ -66,9 +66,13 @@ pygame.display.set_caption("Test")
 #=====[ VARIABLES ]=====
 # Constant variable representing a movement speed of 5 pixels for the player sprite
 PIX = 5
+# The following constant variables represent RGB values for the lasers
 RED = (255, 0, 0)
 BLUE = (0,0,255)
 GREEN = (0,255,0)
+# This list represents the amount of time the Bug Type 2 has fired, and its limits can be adjusted accordingly to match
+# level difficulty
+b2lasers =[]
 
 #=====[ SPRITE GROUPS]=====
 # This creates a pygame group for (A)LL (SP)RITES
@@ -83,7 +87,7 @@ lasers = pygame.sprite.Group()
 blasers = pygame.sprite.Group()
 
 #=====[ CLASSES AND FUNCTIONS ]=====
-#------[ PLAYER CLASS ]-------
+#------[ PLAYER SPRITE CLASS ]-------
 class Player(pygame.sprite.Sprite):
     # Constructor for Player Sprite
     def __init__(self, health):
@@ -109,7 +113,7 @@ class Player(pygame.sprite.Sprite):
     def moveDown(self, pixels):
         self.rect.y += pixels
 
-# Class for the laser sprite
+#-----[ PLAYERS LASER SPIRTE CLASS ]-----
 class Laser(pygame.sprite.Sprite):
     def __init__(self):
         # Calls pygame's sprite class
@@ -125,7 +129,7 @@ class Laser(pygame.sprite.Sprite):
         # Move the sprite up
         self.rect.y -= 7
 
-#------[ BUG TYPE 1 CLASS ]------
+#------[ BUG TYPE 1 SPRITE CLASS ]------
 class BugT1(pygame.sprite.Sprite):
     def __init__(self):
         # Calls pygame's sprite class
@@ -136,6 +140,7 @@ class BugT1(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         # Instance variable that acts as a boolean for the for loop below
         self.move = 1
+        self.shoot = 1
 
     # Function that draws the Bug Type 1 onto the screen at given coordinates
     def draw(self, window):
@@ -146,17 +151,58 @@ class BugT1(pygame.sprite.Sprite):
         for i in range(self.move):
             #print("x = {}".format(self.rect.x))
             #print("y = {}".format(self.rect.y))
+            # Go right
             if self.rect.x != 745 and self.rect.y == 0:
                 self.rect.x += 5
+            # Go down
             if self.rect.x == 745 and self.rect.y < 40:
                 self.rect.y += 5
+            # Go left
             if self.rect.x != 0 and self.rect.y == 40:
                 self.rect.x -= 5
+            # Go down
             if self.rect.x == 0 and self.rect.y < 80:
                 self.rect.y += 5
-            if self.rect.x < 745 and self.rect.y == 80:
+            # Go right
+            if self.rect.x != 745 and self.rect.y == 80:
                 self.rect.x += 5
+            # Go down
+            if self.rect.x == 745 and self.rect.y < 120:
+                self.rect.y += 5
+            # Go left
+            if self.rect.x > 0 and self.rect.y == 120:
+                self.rect.x -= 5
 
+        if (self.rect.x % 75 == 0):
+            print("x = {}".format(self.rect.x))
+            blaser = B1Laser()
+            self.shoot += 1
+            # Set laser to appear from player's coordinates
+            blaser.rect.x = self.rect.x + 24
+            blaser.rect.y = self.rect.y + 60
+            # Add laser to the ALL SPRITES group as it's made
+            asp.add(blaser)
+            # Add laser to the Lasers group as it's made
+            blasers.add(blaser)
+
+        """I think it'd be cool if we had a level where the bug type 1 just closed in the player at different y intervals
+        while showering down laserfire. You'd have to make it shoot in an infinite loop though"""
+#-----[ BUG TYPE 1 LASER SPRITE CLASS ]-----
+class B1Laser(pygame.sprite.Sprite):
+    def __init__(self):
+        # Calls pygame's sprite class
+        super().__init__()
+        # Creates a rectangle with width and height of 4 and fills it with predefined color RED
+        self.image = pygame.Surface([4,10])
+        self.image.fill(GREEN)
+        # Creates a rectangle (hitbox) for the sprite and tracks its coordinates
+        self.rect = self.image.get_rect()
+
+    # Updates the sprite's movements
+    def update(self):
+        # Move the sprite up
+        self.rect.y += 7
+#-----[ BUG TYPE 2 SPRITE CLASS]-----
 class BugT2(pygame.sprite.Sprite):
     def __init__(self):
         # Calls pygame's sprite class
@@ -173,19 +219,23 @@ class BugT2(pygame.sprite.Sprite):
     # Update the sprite's movement
     def update(self):
         # Go down to y = 100
-        if self.rect.y != 200:
+        if self.rect.y != 200 and len(b2lasers) != 10:
             self.rect.y += 1
         # Attempt to get it to shoot.
         if self.rect.y == 50 or self.rect.y == 100 or self.rect.y == 200:
             blaser = B2Laser()
             # Set laser to appear from player's coordinates
-            blaser.rect.x = self.rect.x + 24
+            blaser.rect.x = self.rect.x + 28
             blaser.rect.y = self.rect.y + 60
             # Add laser to the ALL SPRITES group as it's made
             asp.add(blaser)
             # Add laser to the Lasers group as it's made
             blasers.add(blaser)
+            b2lasers.append("1")
+        if self.rect.y == 200 and len(b2lasers) > 80:
+            self.rect.y +=1
 
+#-----[ BUG TYPE 2 LASER SPRITE CLASS ]-----
 # Class for Bug Type 2's Laser fire (B and L are capitalized!!)
 class B2Laser(pygame.sprite.Sprite):
     def __init__(self):
