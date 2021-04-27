@@ -34,7 +34,7 @@ COLIN: But it also lacks:
 """
 # Import pygame
 import pygame
-
+import random
 # Initialize the pygame module
 pygame.init()
 
@@ -80,8 +80,16 @@ BLUE = (0,0,255)
 GREEN = (0,255,0)
 # This list represents the amount of time the Bug Type 2 has fired, and its limits can be adjusted accordingly to match
 # level difficulty
-b2lasers =[]
+b2lasers = []
+# This constant variable represents the amount of pixels Bug Type 1's travel per frame.
+# This can be adjusted per difficulty
+BUG1_MOV = 5
+# This constant variable represents the number the Bug Type 1s' coordinates can be modulated by to fire.
+# Basically, it's the bug's fire rate. The lower the number, the faster it fires. This can be adjusted per difficulty
+BUG1_FIRE = 110
 
+spawn1 = []
+spawn2 = []
 #=====[ SPRITE GROUPS]=====
 # This creates a pygame group for (A)LL (SP)RITES
 asp = pygame.sprite.Group()
@@ -159,55 +167,55 @@ class BugT1(pygame.sprite.Sprite):
         for i in range(self.move):
             #print("x = {}".format(self.rect.x))
             #print("y = {}".format(self.rect.y))
+            if self.rect.x < 0 and self.rect.y == 0:
+                self.rect.x += BUG1_MOV
             # Go right
-            if self.rect.x != 745 and self.rect.y == 0:
-                self.rect.x += 5
+            if self.rect.x >= 0 and self.rect.y == 0:
+                self.rect.x += BUG1_MOV
             # Go down
             if self.rect.x == 745 and 0 <= self.rect.y < 40:
-                self.rect.y += 5
+                self.rect.y += BUG1_MOV
             # Go left
             if self.rect.x != 0 and self.rect.y == 40:
-                self.rect.x -= 5
+                self.rect.x -= BUG1_MOV
             # Go down
             if self.rect.x == 0 and 40 <= self.rect.y < 80:
-                self.rect.y += 5
+                self.rect.y += BUG1_MOV
             # Go right
             if self.rect.x != 745 and self.rect.y == 80:
-                self.rect.x += 5
+                self.rect.x += BUG1_MOV
             # Go down
             if self.rect.x == 745 and 80 <= self.rect.y < 120:
-                self.rect.y += 5
+                self.rect.y += BUG1_MOV
             # Go left
             if self.rect.x > 0 and self.rect.y == 120:
-                self.rect.x -= 5
+                self.rect.x -= BUG1_MOV
             # Go down
             if self.rect.x == 0 and 120 <= self.rect.y < 160:
-                self.rect.y += 5
+                self.rect.y += BUG1_MOV
             # Go right
             if self.rect.x != 745 and self.rect.y == 160:
-                self.rect.x += 5
+                self.rect.x += BUG1_MOV
             # Go down
             if self.rect.x == 745 and 160 <= self.rect.y < 200:
-                self.rect.y += 5
+                self.rect.y += BUG1_MOV
             # Go left
             if self.rect.x > 0 and self.rect.y == 200:
-                self.rect.x -= 5
+                self.rect.x -= BUG1_MOV
             # Go down
             if self.rect.x == 0 and 160 <= self.rect.y < 200:
-                self.rect.y += 5
+                self.rect.y += BUG1_MOV
             # Go right
             if self.rect.x != 745 and self.rect.y == 160:
-                self.rect.x += 5
+                self.rect.x += BUG1_MOV
 
-
-
-        if (self.rect.x % 75 == 0):
-            print("x = {}".format(self.rect.x))
+        if (self.rect.x % BUG1_FIRE == 0):
+            #print("x = {}".format(self.rect.x))
             blaser = B1Laser()
             self.shoot += 1
             # Set laser to appear from player's coordinates
             blaser.rect.x = self.rect.x + 24
-            blaser.rect.y = self.rect.y + 60
+            blaser.rect.y = self.rect.y + 40
             # Add laser to the ALL SPRITES group as it's made
             asp.add(blaser)
             # Add laser to the Lasers group as it's made
@@ -222,7 +230,7 @@ class B1Laser(pygame.sprite.Sprite):
         super().__init__()
         # Creates a rectangle with width and height of 4 and fills it with predefined color RED
         self.image = pygame.Surface([4,10])
-        self.image.fill(GREEN)
+        self.image.fill(RED)
         # Creates a rectangle (hitbox) for the sprite and tracks its coordinates
         self.rect = self.image.get_rect()
 
@@ -302,18 +310,58 @@ def main():
     player.rect.y = 360
 
     # Testing the bugs spawn at (0,0)
-    b1 = BugT1()
-    asp.add(b1)
-    enemy.add(b1)
-    b1.rect.x = 0
-    b1.rect.y = 0
+    # This list spawns 5 of the Type 1 bugs
+    def wave1():
+        spawn1 = ["1","2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
+        for i in range(len(spawn1)):
+            # create a bug 1 type
+            b1 = BugT1()
+            # add it to the all sprites list
+            asp.add(b1)
+            # add it to the enemy sprite list
+            enemy.add(b1)
+            # set its initial coordinates to (0,0)
+            b1.rect.x = 0
+            b1.rect.y = 0
+            spawn1.append("1")
+            #print("Spawn 1 = {}".format(spawn1))
+            for j in range(len(spawn1)):
+                    b1.rect.x -= 80
 
-    # Testing another bug's spawn at (120,0)
+        spawn2 = ["1","2","3", "4", "5"]
+        for i in range(len(spawn2)):
+            b2 = BugT2()
+            asp.add(b2)
+            enemy.add(b2)
+            for c in range(len(spawn2)):
+                b2.rect.x = random.randint(200,600)
+                b2.rect.y = -200
+            #print("Spawn 2 = {}".format(spawn2))
+
+
+    def wave2():
+        spawn2 =["1","2","3","4","5","6","7","8","9","10"]
+        for i in range(len(spawn2)):
+            b2 = BugT2()
+            asp.add(b2)
+            enemy.add(b2)
+            for c in range(len(spawn2)):
+                b2.rect.x = random.randint(100,600)
+                b2.rect.y = -200
+            #print("Spawn 2 = {}".format(spawn2))
+            for j in range(len(spawn2)):
+                b2.rect.x -= 60
+
+
+    wave1()
+    wave2()
+
+    """# Testing another bug's spawn at (120,0)
     b2 = BugT2()
     asp.add(b2)
     enemy.add(b2)
     b2.rect.x = 120
-    b2.rect.y = 0
+    b2.rect.y = 0"""
 
     #-----[ DISPLAY FUNCTION ]----
     # This function, nested into the main loop, displays everything
@@ -376,6 +424,7 @@ def main():
             for laser in enemyhit:
                 lasers.remove(laser)
                 asp.remove(laser)
+
                 print("HIT!")
 
         #-----[ BUG'S LASERS / PLAYER(S) COLLISION ]-----
