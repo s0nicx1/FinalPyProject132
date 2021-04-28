@@ -1,28 +1,36 @@
 """
 COLIN: So far this version of our project contains:
-- Player movement
-- A player sprite
-- A type of enemy sprite
-- basic projectile and collision
+- Player sprite (Movement and firing ability)
+- Two types of enemy sprites (Bug Type 1 and Bug Type 2, both with movement and firing abilities)
+- Basic collision between corresponding sprites and lasers (No health system)
 COLIN: But it also lacks:
-- A main menu with game options ( 1 player, 2 player co-op)
-- Player lives {and health?}
+- A Main Menu with game options  (1 player, 2 player co-op,(2 player versus??), Difficulties)
+- Sprite lives/health
 - Co-op and Versus???
-- Enemy variations, movements, attacks, spawning, and health
-- Music for menu?
+- Level/Difficulty escalation
+- Bug Type 3
+- Final Boss?
+- Music exlusive to main menu?
 - Arcade button compatibility
 - A box to put it all in
 """
 
 """
-4/26 Change Log: 
+4/26 Change Log [TL;DR]: 
+- Added Bug Type 2 (testing firing and movement)
+- Added Bug Laser Class (with disliked collision) 
+- Bug Type 1 can now fire lasers
+- Added health variable for Player Sprite (ineffective)
+- Moved sprites' groups list to the top of file (access them as pre-defined variables)
+- Converted laserfire.mp3 to laserfire.wav (RPi compatibility) 
+
+COLIN:
 - Added and currently am testing another bug type (BUG TYPE 2). It fires a laser at certain coordinates as it moves down
   the screen. After shooting for so long, it moves off screen (I'll look into despawning it later)
 - Bug Type 1 now fires lasers. It fires down whenever its coordinates can cleanly be modulated by 75 for a remainder of 0.
   I think I should make it a constant variable that goes up with difficulty. But know that I think about it, if we spawn
   multiples of those sprites, they'd be shooting in the exact same place. not very good at the start, but I guess it 
   could be fun later on.
-- Extended Bug Type 1's moving commands. I really should see if there's an edge bounce thing with pygame 
 - Added Bugs' Laser class and collision with the player. I don't like the collision though
 - Made a health instance variable for the player. It cannot fire lasers after running out of health by getting hit 
   by laser fire. HOWEVER, if the player has more than 1 health, the sprite will automatically be removed by the 
@@ -32,8 +40,12 @@ COLIN: But it also lacks:
 - Converted laserfire.mp3 to laserfire.wav. RPi didn't like it for some reason, but it accepted game_music.mp3. 
   As it should
   
-4/27 Change Log:
-- Attempted to make enemies spawn in waves. not exactly what I wanted it to be. 
+4/27 Change Log [TL;DR]:
+- Attempted to make enemies spawn in waves. (WIP)
+- Finished movement chart for Bug Type 1 (Messy)
+
+COLIN:
+- Been messing around with adding enemy sprites as waves. Doesn't work exactly how I want it to. I'll look into it
 """
 # Import pygame
 import pygame
@@ -74,7 +86,7 @@ WIN = pygame.display.set_mode(SIZE)
 # Sets caption for upper left corner of window
 pygame.display.set_caption("Test")
 
-#=====[ VARIABLES ]=====
+#=====[ VARIABLES AND LISTS]=====
 # Constant variable representing a movement speed of 5 pixels for the player sprite
 PIX = 5
 # The following constant variables represent RGB values for the lasers
@@ -85,15 +97,25 @@ GREEN = (0,255,0)
 # level difficulty
 b2lasers = []
 # This constant variable represents the amount of pixels Bug Type 1's travel per frame.
-# This can be adjusted per difficulty
-BUG1_MOV = 5
+# This can be adjusted per difficulty. However, I think it'd be best to make it where the bugs get faster the
+# longer they're alive
+BUG1_MOV1 = 5
+BUG1_MOV2 = 10
+
+# These constant variables represent the x-coordinates where the Bug Type 1 should bounce off of.
+R_EDGE = 745
+L_EDGE = -5
+
 # This constant variable represents the number the Bug Type 1s' coordinates can be modulated by to fire.
 # Basically, it's the bug's fire rate. The lower the number, the faster it fires. This can be adjusted per difficulty
+"""COLIN: BUG TYPE 1 WILL NOT FIRE once movement speed is updated if this remains == 110"""
 BUG1_FIRE = 110
 
+# Lists that contain amount of enemies to spawn per wave
 spawn1 = []
 spawn2 = []
-#=====[ SPRITE GROUPS]=====
+
+#=====[ SPRITE GROUPS ]=====
 # This creates a pygame group for (A)LL (SP)RITES
 asp = pygame.sprite.Group()
 # This creates a pygame group for player(s)
@@ -106,7 +128,7 @@ lasers = pygame.sprite.Group()
 blasers = pygame.sprite.Group()
 
 #=====[ CLASSES AND FUNCTIONS ]=====
-#------[ PLAYER SPRITE CLASS ]-------
+#-----[ PLAYER SPRITE CLASS ]-----
 class Player(pygame.sprite.Sprite):
     # Constructor for Player Sprite
     def __init__(self, health):
@@ -118,7 +140,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.health = health
 
-    #-----[ PLAYER MOVEMENT FUNCTIONS]-----
+    # Player movement functions
     # Function that moves the player to the right when called
     def moveRight(self, pixels):
         self.rect.x += pixels
@@ -168,49 +190,72 @@ class BugT1(pygame.sprite.Sprite):
     # Update the sprite's movement
     def update(self):
         for i in range(self.move):
-            #print("x = {}".format(self.rect.x))
+            print("x = {}".format(self.rect.x))
             #print("y = {}".format(self.rect.y))
-            if self.rect.x < 0 and self.rect.y == 0:
-                self.rect.x += BUG1_MOV
+
+            # Move from off screen
+            if self.rect.x < L_EDGE and self.rect.y == 0:
+                self.rect.x += BUG1_MOV1
             # Go right
-            if self.rect.x >= 0 and self.rect.y == 0:
-                self.rect.x += BUG1_MOV
-            # Go down
-            if self.rect.x == 745 and 0 <= self.rect.y < 40:
-                self.rect.y += BUG1_MOV
+            if self.rect.x >= L_EDGE and self.rect.y == 0:
+                self.rect.x += BUG1_MOV1
+            # Go down (x == edge coordinate and (prev y value =< current y value < next y value))
+            if self.rect.x == R_EDGE and 0 <= self.rect.y < 40:
+                self.rect.y += BUG1_MOV1
             # Go left
-            if self.rect.x != 0 and self.rect.y == 40:
-                self.rect.x -= BUG1_MOV
+            if self.rect.x != L_EDGE and self.rect.y == 40:
+                self.rect.x -= BUG1_MOV1
             # Go down
-            if self.rect.x == 0 and 40 <= self.rect.y < 80:
-                self.rect.y += BUG1_MOV
+            if self.rect.x == L_EDGE and 40 <= self.rect.y < 80:
+                self.rect.y += BUG1_MOV1
             # Go right
-            if self.rect.x != 745 and self.rect.y == 80:
-                self.rect.x += BUG1_MOV
+            if self.rect.x != R_EDGE and self.rect.y == 80:
+                self.rect.x += BUG1_MOV1
             # Go down
-            if self.rect.x == 745 and 80 <= self.rect.y < 120:
-                self.rect.y += BUG1_MOV
+            if self.rect.x == R_EDGE and 80 <= self.rect.y < 120:
+                self.rect.y += BUG1_MOV1
             # Go left
-            if self.rect.x > 0 and self.rect.y == 120:
-                self.rect.x -= BUG1_MOV
+            if self.rect.x > L_EDGE and self.rect.y == 120:
+                self.rect.x -= BUG1_MOV1
             # Go down
-            if self.rect.x == 0 and 120 <= self.rect.y < 160:
-                self.rect.y += BUG1_MOV
+            if self.rect.x == L_EDGE and 120 <= self.rect.y < 160:
+                self.rect.y += BUG1_MOV1
             # Go right
-            if self.rect.x != 745 and self.rect.y == 160:
-                self.rect.x += BUG1_MOV
+            if self.rect.x != R_EDGE and self.rect.y == 160:
+                self.rect.x += BUG1_MOV1
             # Go down
-            if self.rect.x == 745 and 160 <= self.rect.y < 200:
-                self.rect.y += BUG1_MOV
+            if self.rect.x == R_EDGE and 160 <= self.rect.y < 200:
+                self.rect.y += BUG1_MOV1
             # Go left
-            if self.rect.x > 0 and self.rect.y == 200:
-                self.rect.x -= BUG1_MOV
+            if self.rect.x > L_EDGE and self.rect.y == 200:
+                self.rect.x -= BUG1_MOV2
             # Go down
-            if self.rect.x == 0 and 160 <= self.rect.y < 200:
-                self.rect.y += BUG1_MOV
+            if self.rect.x == L_EDGE and 200 <= self.rect.y < 240:
+                self.rect.y += BUG1_MOV2
             # Go right
-            if self.rect.x != 745 and self.rect.y == 160:
-                self.rect.x += BUG1_MOV
+            if self.rect.x != R_EDGE and self.rect.y == 240:
+                self.rect.x += BUG1_MOV2
+            # Go down
+            if self.rect.x == R_EDGE and 240 <= self.rect.y < 280:
+                self.rect.y += BUG1_MOV2
+            # Go left
+            if self.rect.x > L_EDGE and self.rect.y == 280:
+                self.rect.x -= BUG1_MOV2
+            # Go down
+            if self.rect.x == L_EDGE and 280 <= self.rect.y < 320:
+                self.rect.y += BUG1_MOV2
+            # Go right
+            if self.rect.x != R_EDGE and self.rect.y == 320:
+                self.rect.x += BUG1_MOV2
+            # Go down
+            if self.rect.x == R_EDGE and 320 <= self.rect.y < 360:
+                self.rect.y += BUG1_MOV2
+            # Go left
+            if self.rect.x != -40 and self.rect.y == 360:
+                self.rect.x -= BUG1_MOV2
+                # If x coordinate > 840, remove sprite from game
+                if self.rect.x <= -40:
+                    self.kill()
 
         if (self.rect.x % BUG1_FIRE == 0):
             #print("x = {}".format(self.rect.x))
@@ -224,8 +269,9 @@ class BugT1(pygame.sprite.Sprite):
             # Add laser to the Lasers group as it's made
             blasers.add(blaser)
 
-    """I think it'd be cool if we had a level where the bug type 1 just closed in the player at different y intervals
+    """COLIN: I think it'd be cool if we had a level where the bug type 1 just closed in the player at different y intervals
     while showering down laserfire. You'd have to make it shoot in an infinite loop though"""
+
 #-----[ BUG TYPE 1 LASER SPRITE CLASS ]-----
 class B1Laser(pygame.sprite.Sprite):
     def __init__(self):
@@ -241,6 +287,7 @@ class B1Laser(pygame.sprite.Sprite):
     def update(self):
         # Move the sprite up
         self.rect.y += 7
+
 #-----[ BUG TYPE 2 SPRITE CLASS]-----
 class BugT2(pygame.sprite.Sprite):
     def __init__(self):
@@ -312,10 +359,10 @@ def main():
     player.rect.x = 400
     player.rect.y = 360
 
-    # Testing the bugs spawn at (0,0)
-    # This list spawns 5 of the Type 1 bugs
+    # Wave 1
     def wave1():
-        spawn1 = ["1","2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"]
+        # Spawns 3 of Bug Type 1's
+        spawn1 = ["1", "2", "3"]
         for i in range(len(spawn1)):
             # create a bug 1 type
             b1 = BugT1()
@@ -323,25 +370,31 @@ def main():
             asp.add(b1)
             # add it to the enemy sprite list
             enemy.add(b1)
-            # set its initial coordinates to (0,0)
-            b1.rect.x = 0
+            # set its initial coordinates to (-80,0)
+            b1.rect.x = -80
             b1.rect.y = 0
+            # Add to the list
             spawn1.append("1")
-            #print("Spawn 1 = {}".format(spawn1))
             for j in range(len(spawn1)):
-                    b1.rect.x -= 80
+                # Put some space between the sprites
+                """COLIN: Currently, this just makes the whole list of enemies back up an ungodly amount."""
+                b1.rect.x -= 80
 
+        # Spawns 5 of Bug Type 2's
         spawn2 = ["1","2","3", "4", "5"]
+        # Create Bug Type 2's and add them to appropriate lists
         for i in range(len(spawn2)):
             b2 = BugT2()
             asp.add(b2)
             enemy.add(b2)
+            # Place Bugs at random intervals between 200 and 600, and make spawn them off screen
             for c in range(len(spawn2)):
                 b2.rect.x = random.randint(200,600)
                 b2.rect.y = -200
-            #print("Spawn 2 = {}".format(spawn2))
 
+            # TROUBLESHOOTING: print("Spawn 2 = {}".format(spawn2))
 
+    """# Wave 2 
     def wave2():
         spawn2 =["1","2","3","4","5","6","7","8","9","10"]
         for i in range(len(spawn2)):
@@ -353,18 +406,13 @@ def main():
                 b2.rect.y = -200
             #print("Spawn 2 = {}".format(spawn2))
             for j in range(len(spawn2)):
-                b2.rect.x -= 60
+                b2.rect.x -= 60"""
 
-
+    # Calls the wave functions
+    """COLIN: Let's take things one at a time, and I may have to import time so there's a delay between calling the two
+    functions. """
     wave1()
-    wave2()
-
-    """# Testing another bug's spawn at (120,0)
-    b2 = BugT2()
-    asp.add(b2)
-    enemy.add(b2)
-    b2.rect.x = 120
-    b2.rect.y = 0"""
+    # wave2()
 
     #-----[ DISPLAY FUNCTION ]----
     # This function, nested into the main loop, displays everything
@@ -385,6 +433,7 @@ def main():
         pygame.mixer.music.load(MUSIC_FILE)
         pygame.mixer.music.play()
 
+    # Calls the music function
     music()
 
     #-----[ GAME LOGIC ]-----
@@ -427,8 +476,8 @@ def main():
             for laser in enemyhit:
                 lasers.remove(laser)
                 asp.remove(laser)
-
                 print("HIT!")
+
 
         #-----[ BUG'S LASERS / PLAYER(S) COLLISION ]-----
         # Collision between the Bug's lasers and the player
