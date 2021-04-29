@@ -482,12 +482,17 @@ def main():
         #-----[ BUG'S LASERS / PLAYER(S) COLLISION ]-----
         # Collision between the Bug's lasers and the player
         for blaser in blasers:
-            playerhit = pygame.sprite.spritecollide(blaser,ship, True)
+            playerhit = pygame.sprite.spritecollide(blaser,ship, False)
             for blaser in playerhit:
                 blasers.remove(blaser)
                 asp.remove(blaser)
                 player.health -= 1
                 print("OUCH!")
+                if player.health <= 0:
+                    player.kill()
+                    player.remove(asp)
+                    player.remove(ship)
+
 
 
         #-----[ PLAYER MOVEMENT ]-----
