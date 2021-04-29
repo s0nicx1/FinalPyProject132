@@ -190,7 +190,7 @@ class BugT1(pygame.sprite.Sprite):
     # Update the sprite's movement
     def update(self):
         for i in range(self.move):
-            print("x = {}".format(self.rect.x))
+            #print("x = {}".format(self.rect.x))
             #print("y = {}".format(self.rect.y))
 
             # Move from off screen
@@ -362,7 +362,7 @@ def main():
     # Wave 1
     def wave1():
         # Spawns 3 of Bug Type 1's
-        spawn1 = ["1", "2", "3"]
+        spawn1 = ["1", "2", "3","4","5","6","7","8","9","10","11", "12", "13"]
         for i in range(len(spawn1)):
             # create a bug 1 type
             b1 = BugT1()
