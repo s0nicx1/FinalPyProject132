@@ -433,6 +433,23 @@ def wave1():
             b3.rect.x = 760
         b3.rect.y = -500
 
+    # Incrementer
+    b = 50
+    # Spawn 20 enemies
+    for i in range(1, 21):
+        # create a bug 1 type
+        b1 = BugT1()
+        # add it to the all sprites list
+        asp.add(b1)
+        # add it to the enemy sprite list
+        enemy.add(b1)
+        wave1g.add(b1)
+        # set its initial coordinates to (-80,0)
+        # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug
+        b1.rect.x = -80 * b
+        b1.rect.y = 0
+        b += 1
+
 
 #=====[ MAIN GAME LOOP ]=====
 # COLIN: Here is where the game is run. It sets up the foundation of the pygame, then refers to several
