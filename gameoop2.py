@@ -357,7 +357,6 @@ class B2Laser(pygame.sprite.Sprite):
         if self.rect.y > 400:
             self.kill()
 
-
 #-----[ BUG TYPE 3 SPRITE CLASS]-----
 class BugT3(pygame.sprite.Sprite):
     def __init__(self):
@@ -403,12 +402,12 @@ def wave1():
         b += 1
 
 
-def wave2():
+
     # Create Bug Type 2's
     # Incrementer
-    s = 1
+    s = 0
     # Spawn 4 enemies
-    for i in range(1,5):
+    for i in range(1, 11):
         # Create a bug type 2
         b2 = BugT2()
         # add it to all sprites list
@@ -419,7 +418,7 @@ def wave2():
         # Place offscreen
         # Everytime a bug gets spawned, s is incremented by 1, so 100 pixels of space is made between each bug
         b2.rect.x = 100 * s
-        b2.rect.y = -200
+        b2.rect.y = -500
         s += 1
 
     for i in range(1, 3):
@@ -432,7 +431,7 @@ def wave2():
             b3.rect.x = 0
         if spawn == 1:
             b3.rect.x = 760
-        b3.rect.y = 0
+        b3.rect.y = -500
 
 
 #=====[ MAIN GAME LOOP ]=====
@@ -632,8 +631,7 @@ def main():
         # Calls the display function
         display()
 
-        if len(enemy) == 0 and len(wave1g) == 0:
-            wave2()
+
         print(len(enemy))
 
 
