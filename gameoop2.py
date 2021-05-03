@@ -654,14 +654,25 @@ def main():
             player.moveDown(PIX)
 
 
+        # LEDS
         if player.health == 3:
             GPIO.output(leds, True)
+            print("LED ON")
+        if player.health == 2:
+            GPIO.output(13, False)
+            GPIO.output((16,17),True)
+        if player.health == 1:
+            GPIO.output((13,16), False)
+            GPIO.output(17 ,True)
+        if alive == 0:
+            GPIO.output(leds, False)
+            print("LED OFF")
 
         # Calls the display function
         display()
 
 
-        print(len(enemy))
+       # print(len(enemy))
 
 
 
