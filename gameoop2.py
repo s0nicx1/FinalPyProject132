@@ -50,6 +50,8 @@ COLIN:
 # Import pygame
 import pygame
 import random
+import RPi.GPIO as GPIO
+
 # Initialize the pygame module
 pygame.init()
 
@@ -118,6 +120,12 @@ BUG1_FIRE = 110
 
 # This boolean variable states whether or not the player is alive, and if the game should continue
 alive = 0
+
+leds = [17,16,13]
+
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(leds,GPIO.OUT)
 
 #=====[ SPRITE GROUPS ]=====
 # This creates a pygame group for (A)LL (SP)RITES
@@ -644,6 +652,10 @@ def main():
             player.moveUp(PIX)
         if keys_pressed[pygame.K_s] and player.rect.y < 360 and alive == 1:
             player.moveDown(PIX)
+
+
+        if player.health == 3:
+            GPIO.output(leds, True)
 
         # Calls the display function
         display()
