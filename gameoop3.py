@@ -87,12 +87,15 @@ BUG1_FIRE = 110
 
 # This boolean variable states whether or not the player is alive, and if the game should continue
 p1alive = 1
-p2alive = 2
+p2alive = 0
 
-
-GPIO.setmode(GPIO.BCM)
 
 leds = [13,16,17]
+but = [20,27]
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(but, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+GPIO.setup(leds,GPIO.OUT)
+
 
 #=====[ SPRITE GROUPS ]=====
 # This creates a pygame group for (A)LL (SP)RITES
@@ -457,6 +460,9 @@ def spawn():
         b += 1
 
 
+def buttons(x):
+    return x
+
 #=====[ MAIN GAME LOOP ]=====
 # COLIN: Here is where the game is run. It sets up the foundation of the pygame, then refers to several
 # classes and functions to display the pygame.
@@ -530,7 +536,14 @@ def main():
     #-----[ GAME LOGIC ]-----
     # Game loop for key controls
     while run:
+        for i in range(len(but)):
+            if (GPIO.input(but[i])):
+                print("{}".format(but[i]))
 
+                if but[i] == 20:
+                    print("SHOOT")
+                    
+    
         # Sets the game to reset at the desired frames per second
         clock.tick(FPS)
 
@@ -542,23 +555,22 @@ def main():
                 run = False
 
             #-----[ PLAYER LASER FIRE BUTTON ]-----
-            if event.type == pygame.KEYDOWN:
-                # If the player hits the fire button and has health remaining
-                if event.key == pygame.K_SPACE and p1alive == 1:
-                    # Set laser variable to the Laser class
-                    laser = Laser()
-                    # Set laser to appear from player's coordinates
-                    laser.rect.x = player1.rect.x + 24
-                    laser.rect.y = player1.rect.y
-                    # Add laser to the ALL SPRITES group as it's made
-                    asp.add(laser)
-                    # Add laser to the Lasers group as it's made
-                    lasers.add(laser)
-                    # Troubleshooting: Print Statement to Track if the spacebar is allowing player to fire
-                    # print("Fire!")
-                    pygame.mixer.Sound.play(FIRE)
-
-
+                
+                if event.type == pygame.KEYDOWN:
+                    # If the player hits the fire button and has health remaining
+                    if event.key == pygame.K_SPACE and p1alive == 1:
+                        # Set laser variable to the Laser class
+                        laser = Laser()
+                        # Set laser to appear from player's coordinates
+                        laser.rect.x = player1.rect.x + 24
+                        laser.rect.y = player1.rect.y
+                        # Add laser to the ALL SPRITES group as it's made
+                        asp.add(laser)
+                        # Add laser to the Lasers group as it's made
+                        lasers.add(laser)
+                        # Troubleshooting: Print Statement to Track if the spacebar is allowing player to fire
+                        # print("Fire!")
+                        pygame.mixer.Sound.play(FIRE)
 
 
         #-----[ PLAYER'S LASERS / BUGS COLLISION ]-----
