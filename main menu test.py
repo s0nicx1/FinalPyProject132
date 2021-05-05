@@ -1,6 +1,5 @@
 
 import pygame
-import sys
 
 pygame.init()
 
@@ -13,6 +12,8 @@ pygame.display.set_caption("Galaga test")
 WIDTH = WIN.get_width()
 
 HEIGHT = WIN.get_height()
+
+BG = pygame.image.load("space.jpg")
 
 background_color = (255, 255, 255)
 
@@ -32,7 +33,7 @@ while True:
         if ev.type == pygame.MOUSEBUTTONDOWN:
             pygame.quit()
 
-    WIN.fill((60, 75, 60))
+    WIN.blit(BG, (0,0))
 
     mouse = pygame.mouse.get_pos()
 
@@ -42,7 +43,7 @@ while True:
     else:
         pygame.draw.rect(WIN, button_color_2, [WIDTH / 2, HEIGHT / 2, 140, 40])
 
-    WIN.blit(text, (WIDTH/2+50, HEIGHT/2))
+    WIN.blit(text, (WIDTH/2+44, HEIGHT/2+6))
 
     pygame.display.update()
 
