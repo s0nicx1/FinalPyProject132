@@ -1,5 +1,5 @@
-
 import pygame
+
 
 pygame.init()
 
@@ -21,7 +21,7 @@ button_color = (100, 100, 100)
 
 button_color_2 = (200, 200, 200)
 
-font = pygame.font.SysFont('ariel', 40)
+font = pygame.font.Font('8-BitMadness.ttf', 40)
 
 text = font.render('quit', True, background_color)
 
