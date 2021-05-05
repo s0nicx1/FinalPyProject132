@@ -17,6 +17,7 @@ COLIN: But it also lacks:
 # Import pygame
 import pygame
 import random
+import time
 
 # Initialize the pygame module
 pygame.init()
@@ -53,6 +54,8 @@ BUG4 = pygame.transform.scale(BUG4, (55,40))
 # Grab image for background
 BG = pygame.image.load("space.jpg")
 BG2 = pygame.image.load("space2.png")
+BG3 = pygame.image.load("space3.png")
+BG4 = pygame.image.load("space4.png")
 
 # Grab music for game audio
 MUSIC = pygame.mixer.music.load("game_music.mp3")
@@ -66,7 +69,7 @@ HIT = pygame.mixer.Sound("Explosion.wav")
 PIX = 5
 # The following constant variables represent RGB values for colors
 RED = (255, 0, 0)
-BLUE = (0, 0, 255)
+CYAN = (0, 255, 255)
 GREEN = (0, 255, 0)
 WHITE = (255, 255, 255)
 
@@ -91,7 +94,7 @@ BUG1_FIRE = 110
 #p1alive = 1
 
 
-#=====[ SPRITE GROUPS ]=====a
+#=====[ SPRITE GROUPS ]=====
 # This creates a pygame group for (A)LL (SP)RITES
 asp = pygame.sprite.Group()
 # This creates a pygame group for player(s)
@@ -102,7 +105,9 @@ enemy = pygame.sprite.Group()
 lasers = pygame.sprite.Group()
 # This creates a pygame group for the bugs' lasers
 blasers = pygame.sprite.Group()
+# This creates a pygame group for everything spawned in wave 1
 wave1 = pygame.sprite.Group()
+# This creates a pygame group for everything spawned in wave 2
 wave2 = pygame.sprite.Group()
 
 #=====[ CREATE WINDOW ]======
@@ -393,99 +398,12 @@ class BugT4(pygame.sprite.Sprite):
         if self.rect.x == 800:
             self.kill()
 
-#-----[ SPAWNING FUNCTION ]-----
-# Uses pygame's sprite groups to create waves of enemies
-
-# Wave 1: 20 Bug Type 1's (20 TOTAL)
-# This function is called immediately upon game's launch. After, conditionals will run the game
-def spawn():
-    # Incrementer for space between sprites
-    b = 0
-    # Spawn 20 enemies
-    for i in range(1, 21):
-        # create a bug 1 type
-        b1 = BugT1()
-        # add it to the all sprites list
-        asp.add(b1)
-        wave1.add(b1)
-        # add it to the enemy sprite list
-        enemy.add(b1)
-        # set its initial coordinates to (-80,0)
-        # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug's x
-        b1.rect.x = -80 * b
-        b1.rect.y = 0
-        b += 1
-
-# Wave 2: 20 BT1's, 10 BT2's, 9 BT3's, 9 BT4's (48 TOTAL)
-def spawn2():
-    # Incrementer for space between sprites
-    b = 30
-    # Spawn 20 enemies
-    for i in range(1, 21):
-        # create a bug 1 type
-        b1 = BugT1()
-        # add it to the all sprites list
-        asp.add(b1)
-        wave2.add(b1)
-        # add it to the enemy sprite list
-        enemy.add(b1)
-        # set its initial coordinates to (-80,0)
-        # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug's x
-        b1.rect.x = -80 * b
-        b1.rect.y = 0
-        b += 1
-    # Incrementer for space between sprites
-    s = 0
-    # Spawn 10 enemies
-    for i in range(1, 11):
-        # Create a bug type 2
-        b2 = BugT2()
-        # add it to all sprites list
-        asp.add(b2)
-        # add it to enemy list
-        enemy.add(b2)
-        wave2.add(b2)
-        # Everytime a bug gets spawned, s is incremented by 1, so 100 pixels of space is made between each bug's x
-        b2.rect.x = 100 * s
-        b2.rect.y = -100
-        s += 1
-
-    # Additions: Bug Type 3's
-    for i in range(1, 10):
-        # Create Bug Type 3's, add them to appropriate lists
-        b3 = BugT3()
-        asp.add(b3)
-        enemy.add(b3)
-        wave2.add(b3)
-        # Chooses a random integer between 1,2
-        spawn = random.randint(1,7)
-        # If 1, spawn on left side of screen
-        if spawn > 3:
-            b3.rect.x = 0
-        # If 2, spawn on right side of screen
-        if spawn < 3:
-            b3.rect.x = 760
-        # Set y = -500 (offscreen)
-        b3.rect.y = -800
-
-
-    q = 2
-    for i in range(1,10):
-        b4 = BugT4()
-        asp.add(b4)
-        enemy.add(b4)
-        wave2.add(b4)
-        b4.rect.x = 0
-        b4.rect.y = 80 * q
-        q += 1
-
-
-
 #=====[ MAIN GAME LOOP ]=====
 # COLIN: Here is where the game is run. It sets up the foundation of the pygame, then refers to several
 # classes and functions to display the pygame.
 #-----[ MAIN LOOP ]-----
 def main():
+    current = 0
     points = 0
 
     # Run set to True so the game doesn't end
@@ -504,15 +422,15 @@ def main():
     player1.rect.x = 400
     player1.rect.y = 360
 
-
-    # Calls the function to spawn the enemies
-    spawn()
-
     def display():
         # -----[ DISPLAY FUNCTION ]-----
         # Calls the display function
         # Blit (draw an object) the background at coordinates (0,0)
-        WIN.blit(BG, (0, 0))
+        if current < 400:
+            WIN.blit(BG, (0, 0))
+        if current > 400:
+            WIN.blit(BG4, (0,0))
+
         # Draws all of the sprites in the ALL SPRITES group
         asp.draw(WIN)
         # Calls the update function from any sprites in the ALL SPRITES group
@@ -536,18 +454,103 @@ def main():
         # print("POINTS: {}".format(points))
         # if points % 5 == 0 and points != 0:
 
-        for i in range(1,2):
-            if len(wave1) == 0 and len(enemy) == 0:
-                spawn2()
-                # Kind of scummy, but this adds 1 element to the wave 1 list, so it's considered NOT EMPTY
-                wave1.add(b1)
-            if len(wave1) == 0 and len(wave2) == 0 and len(enemy) == 0:
-                pygame.quit()
 
+        # Print the length of enemies
+        #print(len(enemy))
 
-        print(len(enemy))
+        print(current)
         # Updates the window
         pygame.display.update()
+
+        # -----[ SPAWNING FUNCTION ]-----
+        # Uses pygame's sprite groups to create waves of enemies
+
+        # Wave 1: 20 Bug Type 1's (20 TOTAL)
+        # This function is called immediately upon game's launch. After, conditionals will run the game
+        def spawn():
+            if current == 3:
+                # Incrementer for space between sprites
+                b = 0
+                # Spawn 20 enemies
+
+                for i in range(1, 21):
+                    # create a bug 1 type
+                    b1 = BugT1()
+                    # add it to the all sprites list
+                    asp.add(b1)
+                    wave1.add(b1)
+                    # add it to the enemy sprite list
+                    enemy.add(b1)
+                    # set its initial coordinates to (-80,0)
+                    # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug's x
+                    b1.rect.x = -80 * b
+                    b1.rect.y = 0
+                    b += 1
+
+            if current == 500:
+                # Incrementer for space between sprites
+                b = 20
+                # Spawn 20 enemies
+                for i in range(1, 21):
+                    # create a bug 1 type
+                    b1 = BugT1()
+                    # add it to the all sprites list
+                    asp.add(b1)
+                    wave2.add(b1)
+                    # add it to the enemy sprite list
+                    enemy.add(b1)
+                    # set its initial coordinates to (-80,0)
+                    # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug's x
+                    b1.rect.x = -80 * b
+                    b1.rect.y = 0
+                    b += 1
+                # Incrementer for space between sprites
+                s = 0
+                # Spawn 10 enemies
+                for i in range(1, 11):
+                    # Create a bug type 2
+                    b2 = BugT2()
+                    # add it to all sprites list
+                    asp.add(b2)
+                    # add it to enemy list
+                    enemy.add(b2)
+                    wave2.add(b2)
+                    # Everytime a bug gets spawned, s is incremented by 1, so 100 pixels of space is made between each bug's x
+                    b2.rect.x = 100 * s
+                    b2.rect.y = -100
+                    s += 1
+
+                # Additions: Bug Type 3's
+                for i in range(1, 10):
+                    # Create Bug Type 3's, add them to appropriate lists
+                    b3 = BugT3()
+                    asp.add(b3)
+                    enemy.add(b3)
+                    wave2.add(b3)
+                    # Chooses a random integer between 1,2
+                    spawn = random.randint(1, 7)
+                    # If 1, spawn on left side of screen
+                    if spawn > 3:
+                        b3.rect.x = 0
+                    # If 2, spawn on right side of screen
+                    if spawn < 3:
+                        b3.rect.x = 760
+                    # Set y = -500 (offscreen)
+                    b3.rect.y = -800
+
+                q = 2
+                for i in range(1, 10):
+                    b4 = BugT4()
+                    asp.add(b4)
+                    enemy.add(b4)
+                    wave2.add(b4)
+                    b4.rect.x = 0
+                    b4.rect.y = 80 * q
+                    q += 1
+
+
+        # Calls the function to spawn the enemies
+        spawn()
     #-----[ MUSIC FUNCTION ]-----
     def music():
         MUSIC_FILE = ("game_music.mp3")
@@ -630,6 +633,8 @@ def main():
                     # Put player back at starting coordinates
                     player1.rect.x = 400
                     player1.rect.y = 360
+                    # 1000 msec = 1 sec
+                    pygame.time.delay(100)
             # Remove bug's laser
             for player1 in blasergone:
                 blaser.kill()
@@ -720,9 +725,10 @@ def main():
 
         # PUT SOMETHING HERE FOR MOVEMENT
         player1.move()
+        # A constantly iterating variable in place of a time module
+        current += 1
+        # While the game is running, call the display function
         display()
-
-
 
 #=====[ LAUNCH GAME ]=====
 # Calls main loop
