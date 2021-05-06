@@ -472,103 +472,103 @@ def main():
             WIN.blit(text, textRect)
 
         # Display current variable (for testing uses only)
-        print(current)
+        #print(current)
 
         # Updates the window
         pygame.display.update()
 
-    # -----[ SPAWNING FUNCTION ]-----
-    # Uses pygame's sprite groups to create waves of enemies
-    # Wave 1: 20 Bug Type 1's (20 TOTAL)
-    # This function is called immediately upon game's launch. After, conditionals will run the game
-    def spawn():
-        # WAVE 1 (20 BT1's)
-        if current == 3:
-            # Incrementer for space between sprites
-            b = 0
-            # Spawn 20 enemies
-            for i in range(1, 21):
-                # create a bug 1 type
-                b1 = BugT1()
-                # add it to all appropriate lists
-                asp.add(b1)
-                wave1.add(b1)
-                enemy.add(b1)
-                # set its initial coordinates to (-80,0)
-                # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug's x
-                b1.rect.x = -80 * b
-                b1.rect.y = 0
-                b += 1
+        # -----[ SPAWNING FUNCTION ]-----
+        # Uses pygame's sprite groups to create waves of enemies
+        # Wave 1: 20 Bug Type 1's (20 TOTAL)
+        # This function is called immediately upon game's launch. After, conditionals will run the game
+        def spawn():
+            # WAVE 1 (20 BT1's)
+            if current == 3:
+                # Incrementer for space between sprites
+                b = 0
+                # Spawn 20 enemies
+                for i in range(1, 21):
+                    # create a bug 1 type
+                    b1 = BugT1()
+                    # add it to all appropriate lists
+                    asp.add(b1)
+                    wave1.add(b1)
+                    enemy.add(b1)
+                    # set its initial coordinates to (-80,0)
+                    # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug's x
+                    b1.rect.x = -80 * b
+                    b1.rect.y = 0
+                    b += 1
 
-        # WAVE 2 (20 BT1's, 10 BT2's)
-        if current == 500:
-            # Incrementer for space between sprites
-            b = 20
-            # Spawn 20 BT1's
-            for i in range(1, 21):
-                # Create a bug type 1
-                b1 = BugT1()
-                # add it to all appropriate lists
-                asp.add(b1)
-                wave2.add(b1)
-                enemy.add(b1)
-                # set its initial coordinates to (-80,0)
-                # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug's x
-                b1.rect.x = -80 * b
-                b1.rect.y = 0
-                b += 1
+            # WAVE 2 (20 BT1's, 10 BT2's)
+            if current == 500:
+                # Incrementer for space between sprites
+                b = 20
+                # Spawn 20 BT1's
+                for i in range(1, 21):
+                    # Create a bug type 1
+                    b1 = BugT1()
+                    # add it to all appropriate lists
+                    asp.add(b1)
+                    wave2.add(b1)
+                    enemy.add(b1)
+                    # set its initial coordinates to (-80,0)
+                    # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug's x
+                    b1.rect.x = -80 * b
+                    b1.rect.y = 0
+                    b += 1
 
-            # Incrementer for space between sprites
-            s = 0
-            # Spawn 10 BT2's
-            for i in range(1, 11):
-                # Create a bug type 2
-                b2 = BugT2()
-                # add it to all appropriate sprite lists
-                asp.add(b2)
-                enemy.add(b2)
-                wave2.add(b2)
-                # Everytime a bug gets spawned, s is incremented by 1, so 100 pixels of space is made between each bug's x
-                b2.rect.x = 100 * s
-                b2.rect.y = -100
-                s += 1
+                # Incrementer for space between sprites
+                s = 0
+                # Spawn 10 BT2's
+                for i in range(1, 11):
+                    # Create a bug type 2
+                    b2 = BugT2()
+                    # add it to all appropriate sprite lists
+                    asp.add(b2)
+                    enemy.add(b2)
+                    wave2.add(b2)
+                    # Everytime a bug gets spawned, s is incremented by 1, so 100 pixels of space is made between each bug's x
+                    b2.rect.x = 100 * s
+                    b2.rect.y = -100
+                    s += 1
 
-        if current == 1200:
-            # Bug Type 3's
-            for i in range(1, 10):
-                # Create Bug Type 3's
-                b3 = BugT3()
-                # Add them to appropriate lists
-                asp.add(b3)
-                enemy.add(b3)
-                wave2.add(b3)
-                # Chooses a random integer between 1,2
-                spawn = random.randint(1, 100)
-                # If > 60, spawn on left side of screen
-                if spawn > 60:
-                    b3.rect.x = 0
-                # Else, spawn on right side of screen
-                else:
-                    b3.rect.x = 760
-                # Set y = -500 (off screen)
-                b3.rect.y = -800
+            if current == 1200:
+                # Bug Type 3's
+                for i in range(1, 10):
+                    # Create Bug Type 3's
+                    b3 = BugT3()
+                    # Add them to appropriate lists
+                    asp.add(b3)
+                    enemy.add(b3)
+                    wave2.add(b3)
+                    # Chooses a random integer between 1,2
+                    spawn = random.randint(1, 100)
+                    # If > 60, spawn on left side of screen
+                    if spawn > 60:
+                        b3.rect.x = 0
+                    # Else, spawn on right side of screen
+                    else:
+                        b3.rect.x = 760
+                    # Set y = -500 (off screen)
+                    b3.rect.y = -800
 
-            # Incrementer for space between sprites
-            q = 2
-            for i in range(1, 10):
-                # Create Bug Type 4
-                b4 = BugT4()
-                # Add sprites to all appropriate lists
-                asp.add(b4)
-                enemy.add(b4)
-                wave2.add(b4)
-                # Spawn at x coordinate 0, a y coordinate 80 pixels from other sprites, and increment incrementer
-                b4.rect.x = 0
-                b4.rect.y = 80 * q
-                q += 1
+                # Incrementer for space between sprites
+                q = 2
+                for i in range(1, 10):
+                    # Create Bug Type 4
+                    b4 = BugT4()
+                    # Add sprites to all appropriate lists
+                    asp.add(b4)
+                    enemy.add(b4)
+                    wave2.add(b4)
+                    # Spawn at x coordinate 0, a y coordinate 80 pixels from other sprites, and increment incrementer
+                    b4.rect.x = 0
+                    b4.rect.y = 80 * q
+                    q += 1
 
-    # Calls the function to spawn the enemies
-    spawn()
+        # Calls the function to spawn the enemies
+        spawn()
 
     #-----[ MUSIC FUNCTION ]-----
     def music():
@@ -605,21 +605,21 @@ def main():
 
             #-----[ PLAYER LASER FIRE BUTTON ]-----
                 
-                if event.type == pygame.KEYDOWN:
-                    # If the player hits the fire button and has health remaining
-                    if event.key == pygame.K_SPACE and p1alive == 1:
-                        # Set laser variable to the Laser class
-                        laser = Laser()
-                        # Set laser to appear from player's coordinates
-                        laser.rect.x = player1.rect.x + 26
-                        laser.rect.y = player1.rect.y
-                        # Add laser to the ALL SPRITES group as it's made
-                        asp.add(laser)
-                        # Add laser to the Lasers group as it's made
-                        lasers.add(laser)
-                        # Troubleshooting: Print Statement to Track if the spacebar is allowing player to fire
-                        # print("Fire!")
-                        pygame.mixer.Sound.play(FIRE)
+            if event.type == pygame.KEYDOWN:
+                # If the player hits the fire button and has health remaining
+                if event.key == pygame.K_SPACE and p1alive == 1:
+                    # Set laser variable to the Laser class
+                    laser = Laser()
+                    # Set laser to appear from player's coordinates
+                    laser.rect.x = player1.rect.x + 26
+                    laser.rect.y = player1.rect.y
+                    # Add laser to the ALL SPRITES group as it's made
+                    asp.add(laser)
+                    # Add laser to the Lasers group as it's made
+                    lasers.add(laser)
+                    # Troubleshooting: Print Statement to Track if the spacebar is allowing player to fire
+                    # print("Fire!")
+                    pygame.mixer.Sound.play(FIRE)
 
         # -----[ PLAYER'S LASERS / BUGS COLLISION ]-----
         # Collision between Player's lasers and enemies
@@ -758,7 +758,7 @@ def main():
         # LEDS
         if player1.health == 3:
             GPIO.output(leds, True)
-            print("LED ON")
+            #print("LED ON")
         if player1.health == 2:
             GPIO.output(13, False)
             GPIO.output((16, 17), True)
@@ -767,7 +767,7 @@ def main():
             GPIO.output(17, True)
         if p1alive == 0:
             GPIO.output(leds, False)
-            print("LED OFF")
+            #print("LED OFF")
 
         # A constantly iterating variable in place of a time module
         current += 1
