@@ -14,14 +14,13 @@ COLIN: But it also lacks:
 - A box to put it all in
 """
 
-# Import pygame
+# Import pygame and random module
 import pygame
 import random
 
 
 # Initialize the pygame module
 pygame.init()
-
 
 #=====[ IMAGES & AUDIO ]=====
 # Grabs and adjusts the image to fit onto the screen with desired (width, height)
@@ -72,7 +71,20 @@ PIX = 5
 RED = (255, 0, 0)
 CYAN = (0, 255, 255)
 GREEN = (0, 255, 0)
-WHITE = (255, 255, 255)
+
+#-----[ ON SCREEN BUTTONS ]-----
+# Text color (WHITE)
+text_color = (255, 255, 255)
+# Default button color (LIGHT GREY)
+button_color = (200, 200, 200)
+# Secondary button color (highlighted) (DARK GREY)
+button_color_2 = (100, 100, 100)
+# Text font and size
+font = pygame.font.Font('8-BitMadness.ttf', 40)
+# QUIT text
+quit_text = font.render('quit', True, text_color)
+# 1-Player text
+one_player_text = font.render('1-Player', True, text_color)
 
 # This list represents the amount of time the Bug Type 2 has fired, and its limits can be adjusted accordingly to match
 # level difficulty
@@ -91,10 +103,6 @@ L_EDGE = -5
 """COLIN: BUG TYPE 1 WILL NOT FIRE once movement speed is updated if this remains == 110"""
 BUG1_FIRE = 110
 
-# This boolean variable states whether or not the player is alive, and if the game should continue
-#p1alive = 1
-
-
 #=====[ SPRITE GROUPS ]=====
 # This creates a pygame group for (A)LL (SP)RITES
 asp = pygame.sprite.Group()
@@ -106,6 +114,9 @@ enemy = pygame.sprite.Group()
 lasers = pygame.sprite.Group()
 # This creates a pygame group for the bugs' lasers
 blasers = pygame.sprite.Group()
+
+"""COLIN: Since waves aren't being spawned sequentially, the following lists are
+not needed. But I'll keep them for now just in case"""
 # This creates a pygame group for everything spawned in wave 1
 wave1 = pygame.sprite.Group()
 # This creates a pygame group for everything spawned in wave 2
@@ -118,8 +129,15 @@ SIZE = 800, 400
 WIN = pygame.display.set_mode(SIZE)
 # Sets caption for upper left corner of window
 pygame.display.set_caption("Tech Universe: Re")
+# Constant variables for window's width and height for buttons(May be deleted later)
+WIDTH = WIN.get_width()
+HEIGHT = WIN.get_height()
 
-#=====[ CLASSES AND FUNCTIONS ]=====
+# Boolean variables set to 0 at first. Will be changed
+p1alive = 0
+start = 0
+
+#=====[ CLASSES ]=====
 #-----[ PLAYER SPRITE CLASS ]-----
 class Player(pygame.sprite.Sprite):
     # Constructor for Player Sprite
@@ -198,7 +216,7 @@ class BugT1(pygame.sprite.Sprite):
             # Go right
             if self.rect.x >= L_EDGE and self.rect.y == 0:
                 self.rect.x += BUG1_MOV1
-            # Go down (x == edge coordinate and (prev y value =< current y value < next y value))
+            # Go down (x == edge coordinate and (prev y value =< counter y value < next y value))
             if self.rect.x == R_EDGE and 0 <= self.rect.y < 40:
                 self.rect.y += BUG1_MOV1
             # Go left
@@ -405,7 +423,7 @@ class BugT4(pygame.sprite.Sprite):
 #-----[ MAIN LOOP ]-----
 def main():
     # Iterating variable (controls enemy spawn and background changes)
-    current = 0
+    counter = 0
     # Empty variable for points (iterated per enemy shot)
     points = 0
     # Run set to True so the game doesn't end
@@ -415,46 +433,85 @@ def main():
     # Creates a clock that makes sure computer runs program at desired FPS
     clock = pygame.time.Clock()
 
-    #-----[ SPAWN PLAYER ]-----
-    # create player at desired coordinates (400, 360) and add to appropriate sprite groups
-    player1 = Player(3)
-    p1alive = 1
-    asp.add(player1)
-    ship.add(player1)
-    player1.rect.x = 400
-    player1.rect.y = 360
-
     # -----[ DISPLAY FUNCTION ]-----
     def display():
-        # Blit (draw an object) the background at coordinates (0,0)
-        if current < 400:
-            WIN.blit(BG, (0, 0))
-        # CHANGE BACKGROUND
-        if current > 400:
-            WIN.blit(BG4, (0, 0))
 
-        # Draws all of the sprites in the ALL SPRITES group
-        asp.draw(WIN)
-        # Calls the update function from any sprites in the ALL SPRITES group
-        asp.update()
+        # MAIN MENU SCREEN
+        if p1alive == 0 and start == 0:
+            # Draw background
+            WIN.blit(BG, (0, 0))
+            #-----[ MAIN MENU BUTTONS ]-----
+            # SINGLE PLAYER BUTTON
+            # Blit it on screen, default color, x = 400, y = 150, w = 140, h = 40
+            pygame.draw.rect(WIN, button_color, [WIDTH / 2, 150, 140, 40])
+            #  If mouse is over button, draw with secondary color
+            if WIDTH / 2 <= mouse[0] <= WIDTH / 2 + 140 and 150 < mouse[1] < 190:
+                pygame.draw.rect(WIN, button_color_2, [WIDTH / 2, 150, 140, 40])
+
+            # QUIT BUTTON
+            # Blit it on screen, default color, x = 400, y = 200, w = 140, h = 40
+            pygame.draw.rect(WIN, button_color, [WIDTH / 2, HEIGHT / 2, 140, 40])
+
+            # QUIT BUTTON (HIGHLIGHT)
+            # If 400 < mouse x coordinate < 540 and 200 < mouse y coordinate < 240
+            if WIDTH / 2 <= mouse[0] <= WIDTH / 2 + 140 and HEIGHT / 2 <= mouse[1] <= HEIGHT / 2 + 40:
+                # Draw the same button, but use secondary color
+                pygame.draw.rect(WIN, button_color_2, [WIDTH / 2, HEIGHT / 2, 140, 40])
+                # If button is pressed while over QUIT BUTTON, Exit game
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    pygame.quit()
+
+            # -----[ BUTTON TEXTS ]-----
+            """Must be called after button color changes, as it must appear OVER THEM"""
+            # QUIT TEXT
+            WIN.blit(quit_text, (WIDTH / 2 + 40, HEIGHT / 2 + 6))
+            # 1-PLAYER TEXT
+            WIN.blit(one_player_text, (WIDTH / 2, 156))
+
+        #-----[ GAME PROGRESSION ]-----
+        if p1alive == 1 and start == 1:
+            # Level 1 (BG)
+            if counter < 400:
+                WIN.blit(BG, (0, 0))
+            # Level 2 (BG2)
+            if counter > 400:
+                WIN.blit(BG4, (0, 0))
+
 
         # GAME OVER screen
-        if p1alive == 0:
+        if p1alive == 0 and start == 1:
             # empty all sprites list
             pygame.sprite.Group.empty(asp)
             # Create a font and font size
             font = pygame.font.Font(None, 36)
             # Create text and color it (Boolean makes text clearer I think)
-            text = font.render("Game OVER!", True, WHITE)
+            text = font.render("Game OVER!", True, text_color)
             # Create coordinates for text
             textRect = text.get_rect()
             textRect.center = (400, 200)
             # Draw text on window
             WIN.blit(text, textRect)
 
-        # Display current variable (for testing uses only)
-        print(current)
+            # -----[ QUIT BUTTON ]-----
+            # Blit it on screen, default color, x = 400, y = 200, w = 140, h = 40
+            pygame.draw.rect(WIN, button_color, [WIDTH / 2, HEIGHT / 2, 140, 40])
+            # QUIT BUTTON (HIGHLIGHT)
+            # If 400 < mouse x coordinate < 540 and 200 < mouse y coordinate < 240
+            if WIDTH / 2 <= mouse[0] <= WIDTH / 2 + 140 and HEIGHT / 2 <= mouse[1] <= HEIGHT / 2 + 40:
+                # Draw the same button, but use secondary color
+                pygame.draw.rect(WIN, button_color_2, [WIDTH / 2, HEIGHT / 2, 140, 40])
+                # If button is pressed while over QUIT BUTTON, Exit game
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    pygame.quit()
+            # -----[ BUTTON TEXTS ]-----
+            """Must be called after button color changes, as it must appear OVER THEM"""
+            # QUIT TEXT
+            WIN.blit(quit_text, (WIDTH / 2 + 40, HEIGHT / 2 + 6))
 
+        # Draws all of the sprites in the ALL SPRITES group
+        asp.draw(WIN)
+        # Calls the update function from any sprites in the ALL SPRITES group
+        asp.update()
         # Updates the window
         pygame.display.update()
 
@@ -464,7 +521,7 @@ def main():
         # This function is called immediately upon game's launch. After, conditionals will run the game
         def spawn():
             # WAVE 1 (20 BT1's)
-            if current == 3:
+            if counter == 3:
                 # Incrementer for space between sprites
                 b = 0
                 # Spawn 20 enemies
@@ -481,8 +538,9 @@ def main():
                     b1.rect.y = 0
                     b += 1
 
+
             # WAVE 2 (20 BT1's, 10 BT2's)
-            if current == 500:
+            if counter == 500:
                 # Incrementer for space between sprites
                 b = 20
                 # Spawn 20 BT1's
@@ -514,7 +572,7 @@ def main():
                     b2.rect.y = -100
                     s += 1
 
-            if current == 1200:
+            if counter == 1200:
                 # Bug Type 3's
                 for i in range(1, 10):
                     # Create Bug Type 3's
@@ -564,7 +622,8 @@ def main():
     #-----[ GAME LOGIC ]-----
     # Game loop for key controls
     while run:
-
+        # track mouse
+        mouse = pygame.mouse.get_pos()
         # Sets the game to reset at the desired frames per second
         clock.tick(FPS)
 
@@ -574,6 +633,22 @@ def main():
             if event.type == pygame.QUIT:
                 # Run is set to False; main loop stops
                 run = False
+
+            # SINGLE PLAYER BUTTON FUNCTIONALITY  (HIGHLIGHT)
+            if WIDTH / 2 <= mouse[0] <= WIDTH / 2 + 140 and 150 < mouse[1] < 190:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    # -----[ SPAWN PLAYER ]-----
+                    # create player at desired coordinates (400, 360) and add to appropriate sprite groups
+                    player1 = Player(3)
+                    global p1alive
+                    p1alive = 1
+                    asp.add(player1)
+                    ship.add(player1)
+                    player1.rect.x = 400
+                    player1.rect.y = 360
+                    global start
+                    start = 1
+
 
             #-----[ PLAYER LASER FIRE BUTTON ]-----
             if event.type == pygame.KEYDOWN:
@@ -723,10 +798,23 @@ def main():
                     player1.rect.x = 400
                     player1.rect.y = 360
 
-        # PUT SOMETHING HERE FOR MOVEMENT
-        player1.move()
+
+        # Call player movement function
+        if p1alive == 1:
+            player1.move()
         # A constantly iterating variable in place of a time module
-        current += 1
+        if p1alive == 1:
+            counter += 1
+        else:
+            counter == 0
+
+
+
+        # Some troubleshooting texts
+        #print(p1alive)
+        #print(counter)
+        #print(start)
+
         # While the game is running, call the display function
         display()
 
