@@ -60,7 +60,7 @@ BOSS = pygame.transform.scale(BOSS, (300, 150))
 
 # Grab image for background
 BG = pygame.image.load("space.jpg")
-BG2 = pygame.image.load("space2.png")
+#BG2 = pygame.image.load("space2.png")
 BG3 = pygame.image.load("space3.png")
 BG4 = pygame.image.load("space4.png")
 
@@ -131,18 +131,11 @@ lasers = pygame.sprite.Group()
 blasers = pygame.sprite.Group()
 # This creates a pygame group for everything spawned in wave 1
 bug1 = pygame.sprite.Group()
-# This creates a pygame group for everyAthing spawned in wave 2
+# This creates a pygame group for everything spawned in wave 2
 bug2 = pygame.sprite.Group()
-<<<<<<< HEAD
 bug3 = pygame.sprite.Group()
 bug4 = pygame.sprite.Group()
 boss1 = pygame.sprite.Group()
-=======
-# This creates a pygame group for everything spawned in wave 1
-bug3 = pygame.sprite.Group()
-# This creates a pygame group for everything spawned in wave 2
-bug4 = pygame.sprite.Group()
->>>>>>> 7dfd43824cff4afee8919920d7010cb7c347742b
 
 #=====[ CREATE WINDOW ]======
 # Constant variable for window's width (800) and height (400); RPi screen size
@@ -574,19 +567,6 @@ def main():
             WIN.blit(quit_text, (WIDTH / 2 + 40, 250 + 6))
             # DIFFICULTY TEXT
             WIN.blit(difficulty_text, (WIDTH / 2 + 200, HEIGHT/2 + 6))
-            # DIFFICULTY BUTTON (HIGHLIGHT)
-            # If mouse is over button, draw with secondary color
-            if 600 <= mouse[0] <= 750 and 200 <= mouse[1] <= 240:
-                # Draw the same button, but use secondary color
-                pygame.draw.rect(WIN, button_color_2, [600, 200, BUTTON_W + 20, BUTTON_H])
-                # If button is pressed while over QUIT BUTTON, Exit game
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    """COLIN: A LIST THAT INCREMENTS WHEN CLICKED BUT CAN GET LONGER THAN ITS DEFAULT LENGTH"""
-                    print("THIS IS ALSO A BUTTON")
-
-
-
-
 
         #-----[ GAME PROGRESSION ]-----
         if status["p1alive"] == 1 and status["start"] == 1:
@@ -808,7 +788,7 @@ def main():
                     # Remove player from everything
                     b2.kill()
                     points += 2
-                # If the player has health remaining:d
+                # If the player has health remaining:
                 if b2.health > 0:
                     # Blit the player onto the screen
                     asp.add(b2)
@@ -920,8 +900,7 @@ def main():
             for player1 in crash:
                 player1.health -= 1
                 print("OUCH!")
-                enemy.remove(b3)
-                asp.remove(b3)
+                b2.health -= 1
                 pygame.mixer.Sound.play(HIT)
                 if player1.health <= 0:
                     player1.kill()
