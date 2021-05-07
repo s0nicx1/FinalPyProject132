@@ -18,7 +18,6 @@ COLIN: But it also lacks:
 import pygame
 import random
 
-
 # Initialize the pygame module
 pygame.init()
 
@@ -43,6 +42,10 @@ BUG1A = pygame.transform.scale(BUG1A, (55, 40))
 BUG2 = pygame.image.load("b2.png")
 BUG2 = pygame.transform.scale(BUG2, (65, 80))
 
+# Grabs and adjusts secondary image for second bug type
+BUG2A = pygame.image.load("b2a.png")
+BUG2A = pygame.transform.scale(BUG2A, (65, 80))
+
 # Grabs and adjusts image for third bug type
 BUG3 = pygame.image.load("b3.png")
 BUG3 = pygame.transform.scale(BUG3, (55, 40))
@@ -50,6 +53,10 @@ BUG3 = pygame.transform.scale(BUG3, (55, 40))
 # Grabs and adjusts image for fourth bug type
 BUG4 = pygame.image.load("b4.png")
 BUG4 = pygame.transform.scale(BUG4, (55,40))
+
+# Grabs and adjusts image for the boss
+BOSS = pygame.image.load("b5.png")
+BOSS = pygame.transform.scale(BOSS, (300, 150))
 
 # Grab image for background
 BG = pygame.image.load("space.jpg")
@@ -63,6 +70,7 @@ MUSIC = pygame.mixer.music.load("game_music.mp3")
 # Grabs sound for laser fire
 FIRE = pygame.mixer.Sound("laserfire.wav")
 HIT = pygame.mixer.Sound("Explosion.wav")
+BUZZ = pygame.mixer.Sound("buzz.wav")
 
 #=====[ VARIABLES AND LISTS ]=====
 # Constant variable representing a movement speed of 5 pixels for the player sprite
@@ -118,9 +126,9 @@ blasers = pygame.sprite.Group()
 """COLIN: Since waves aren't being spawned sequentially, the following lists are
 not needed. But I'll keep them for now just in case"""
 # This creates a pygame group for everything spawned in wave 1
-wave1 = pygame.sprite.Group()
+bug1 = pygame.sprite.Group()
 # This creates a pygame group for everything spawned in wave 2
-wave2 = pygame.sprite.Group()
+bug2 = pygame.sprite.Group()
 
 #=====[ CREATE WINDOW ]======
 # Constant variable for window's width (800) and height (400); RPi screen size
@@ -313,11 +321,16 @@ class B1Laser(pygame.sprite.Sprite):
 
 #-----[ BUG TYPE 2 SPRITE CLASS]-----
 class BugT2(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, health):
         # Calls pygame's sprite class
         super().__init__()
+        self.health = health
         # Grabs the predefined variable from up top that represents the bug's image
-        self.image = BUG2
+        self.images = []
+        self.images.append(BUG2)
+        self.images.append(BUG2A)
+        self.index = 0
+        self.image = self.images[self.index]
         # Creates rectangle for the sprite and tracks coordinates
         self.rect = self.image.get_rect()
 
@@ -327,6 +340,8 @@ class BugT2(pygame.sprite.Sprite):
 
     # Update the sprite's movement
     def update(self):
+        if self.health == 1:
+            self.image = self.images[1]
         # Go down the screen until y coordinate == 200
         if self.rect.y != 200 and len(b2lasers) != 10:
             self.rect.y += 1
@@ -417,11 +432,32 @@ class BugT4(pygame.sprite.Sprite):
         if self.rect.x == 800:
             self.kill()
 
+#-----[ BOSS SPRITE CLASS ]-----
+class Boss(pygame.sprite.Sprite):
+    def __init__(self):
+        # Calls pygame's sprite class
+        super().__init__()
+        # Grabs the predefined variable from up top that represents the bug's image
+        self.image = BOSS
+        # Creates rectangle for the sprite and tracks coordinates
+        self.rect = self.image.get_rect()
+
+    # Function that draws the Bug Type 1 onto the screen at given coordinates
+    def draw(self, window):
+        window.blit(self.image, (self.rect.x, self.rect.y))
+
+    # Update the sprite's movement
+    def update(self):
+        # Go down the screen until y coordinate == 200
+        if self.rect.y != 50:
+            self.rect.y += 1
+
 #=====[ MAIN GAME LOOP ]=====
 # COLIN: Here is where the game is run. It sets up the foundation of the pygame, then refers to several
 # classes and functions to display the pygame.
 #-----[ MAIN LOOP ]-----
 def main():
+    player1 = Player(3)
     # Iterating variable (controls enemy spawn and background changes)
     counter = 0
     # Empty variable for points (iterated per enemy shot)
@@ -435,7 +471,6 @@ def main():
 
     # -----[ DISPLAY FUNCTION ]-----
     def display():
-
         # MAIN MENU SCREEN
         if p1alive == 0 and start == 0:
             # Draw background
@@ -522,6 +557,7 @@ def main():
         def spawn():
             # WAVE 1 (20 BT1's)
             if counter == 3:
+
                 # Incrementer for space between sprites
                 b = 0
                 # Spawn 20 enemies
@@ -530,8 +566,7 @@ def main():
                     b1 = BugT1()
                     # add it to all appropriate lists
                     asp.add(b1)
-                    wave1.add(b1)
-                    enemy.add(b1)
+                    bug1.add(b1)
                     # set its initial coordinates to (-80,0)
                     # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug's x
                     b1.rect.x = -80 * b
@@ -549,8 +584,7 @@ def main():
                     b1 = BugT1()
                     # add it to all appropriate lists
                     asp.add(b1)
-                    wave2.add(b1)
-                    enemy.add(b1)
+                    bug1.add(b1)
                     # set its initial coordinates to (-80,0)
                     # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug's x
                     b1.rect.x = -80 * b
@@ -562,11 +596,10 @@ def main():
                 # Spawn 10 BT2's
                 for i in range(1, 11):
                     # Create a bug type 2
-                    b2 = BugT2()
+                    b2 = BugT2(2)
                     # add it to all appropriate sprite lists
                     asp.add(b2)
-                    enemy.add(b2)
-                    wave2.add(b2)
+                    bug2.add(b2)
                     # Everytime a bug gets spawned, s is incremented by 1, so 100 pixels of space is made between each bug's x
                     b2.rect.x = 100 * s
                     b2.rect.y = -100
@@ -580,7 +613,7 @@ def main():
                     # Add them to appropriate lists
                     asp.add(b3)
                     enemy.add(b3)
-                    wave2.add(b3)
+                    #wave2.add(b3)
                     # Chooses a random integer between 1,2
                     spawn = random.randint(1, 100)
                     # If > 60, spawn on left side of screen
@@ -600,11 +633,18 @@ def main():
                     # Add sprites to all appropriate lists
                     asp.add(b4)
                     enemy.add(b4)
-                    wave2.add(b4)
+                    #wave2.add(b4)
                     # Spawn at x coordinate 0, a y coordinate 80 pixels from other sprites, and increment incrementer
                     b4.rect.x = 0
                     b4.rect.y = 80 * q
                     q += 1
+
+            if counter == 2000:
+                boss = Boss()
+                asp.add(boss)
+                enemy.add(boss)
+                boss.rect.x = 250
+                boss.rect.y = 0
 
         # Calls the function to spawn the enemies
         spawn()
@@ -622,6 +662,7 @@ def main():
     #-----[ GAME LOGIC ]-----
     # Game loop for key controls
     while run:
+
         # track mouse
         mouse = pygame.mouse.get_pos()
         # Sets the game to reset at the desired frames per second
@@ -649,7 +690,6 @@ def main():
                     global start
                     start = 1
 
-
             #-----[ PLAYER LASER FIRE BUTTON ]-----
             if event.type == pygame.KEYDOWN:
                 # If the player hits the fire button and has health remaining
@@ -672,12 +712,35 @@ def main():
         for laser in lasers:
             # Create a list that removes laser and enemy once they collide
             # The boolean, if set to true, removes both sprites.
-            enemyhit = pygame.sprite.spritecollide(laser, enemy, True)
+            enemyhit = pygame.sprite.spritecollide(laser, bug1, True)
             for laser in enemyhit:
                 asp.remove(laser)
                 lasers.remove(laser)
                 #print("HIT!")
                 points += 1
+
+        #-----[ SHIP LASERS / BUG 2 COLLISION ]-----
+        # Create a list that removes laser and enemy once they collide
+        # The boolean, if set to true, removes both sprites.
+        for laser in lasers:
+            bug2hit = pygame.sprite.spritecollide(laser, bug2, False)
+            # If the player is hit
+            for b2 in bug2hit:
+                # Decrement health by 1 and display change (audio and visual)
+                b2.health -= 1
+                laser.kill()
+                # If player has no health remaining
+                if b2.health <= 0:
+                    # Remove player from everything
+                    b2.kill()
+                    points += 2
+
+                # If the player has health remaining:d
+                if b2.health > 0:
+                    # Blit the player onto the screen
+                    asp.add(b2)
+                    bug2.add(b2)
+                    pygame.mixer.Sound.play(BUZZ)
 
         #-----[ BUG'S LASERS / PLAYER(S) COLLISION ]-----
         """COLIN: Slight issue. The bugs' lasers disappear whenever they reach the player's last location after
@@ -685,34 +748,29 @@ def main():
         # Collision between the Bug's lasers and the player
         for blaser in blasers:
             playerhit = pygame.sprite.spritecollide(blaser, ship, False)
-            blasergone = pygame.sprite.spritecollide(player1, blasers, True)
             # If the player is hit
             for player1 in playerhit:
                 # Decrement health by 1 and display change (audio and visual)
                 player1.health -= 1
                 print("HEALTH: {}".format(player1.health))
                 pygame.mixer.Sound.play(HIT)
+                blaser.kill()
                 # If player has no health remaining
                 if player1.health <= 0:
                     # Remove player from everything
                     player1.kill()
-                    asp.remove(player1)
-                    ship.remove(player1)
                     # Set player1 alive boolean to false (0)
                     p1alive = 0
-                # If the player has health remaining:
+                # If the player has health remaining:d
                 if player1.health > 0:
                     # Blit the player onto the screen
                     asp.add(player1)
                     ship.add(player1)
                     # Put player back at starting coordinates
-                    player1.rect.x = 400
-                    player1.rect.y = 360
+                    # player1.rect.x = 400
+                    # player1.rect.y = 360
                     # 1000 msec = 1 sec
                     pygame.time.delay(100)
-            # Remove bug's laser
-            for player1 in blasergone:
-                blaser.kill()
 
         #-----[ BUG TYPE 1 / PLAYER SHIP COLLISION ]------
         for b1 in enemy:
@@ -808,12 +866,18 @@ def main():
         else:
             counter == 0
 
-
-
         # Some troubleshooting texts
         #print(p1alive)
         #print(counter)
+        #print(points)
         #print(start)
+        #print(points)
+        """if points % 6 == 0 and points != 0 :
+            points == 0
+            player1.health = 
+
+        print("POINTS: {}".format(points))
+        print("HEALTH: {}".format(player1.health))"""
 
         # While the game is running, call the display function
         display()
