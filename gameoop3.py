@@ -454,6 +454,7 @@ def buttons(x):
 # classes and functions to display the pygame.
 #-----[ MAIN LOOP ]-----
 def main():
+    player1 = Player(3)
     # Iterating variable (controls enemy spawn and background changes)
     counter = 0
     # Empty variable for points (iterated per enemy shot)
@@ -591,7 +592,7 @@ def main():
                 # Spawn 10 BT2's
                 for i in range(1, 11):
                     # Create a bug type 2
-                    b2 = BugT2()
+                    b2 = BugT2(2)
                     # add it to all appropriate sprite lists
                     asp.add(b2)
                     enemy.add(b2)
