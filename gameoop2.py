@@ -79,6 +79,7 @@ PIX = 5
 RED = (255, 0, 0)
 CYAN = (0, 255, 255)
 GREEN = (0, 255, 0)
+BLACK = (0, 0, 0)
 
 #-----[ ON SCREEN BUTTONS ]-----
 # Text color (WHITE)
@@ -138,9 +139,10 @@ pygame.display.set_caption("Tech Universe: Re")
 WIDTH = WIN.get_width()
 HEIGHT = WIN.get_height()
 
-# Boolean variables set to 0 at first. Will be changed
-p1alive = 0
-start = 0
+status = {
+    "p1alive": 0,
+    "start": 0
+}
 
 #=====[ CLASSES ]=====
 #-----[ PLAYER SPRITE CLASS ]-----
@@ -454,6 +456,7 @@ class Boss(pygame.sprite.Sprite):
 # classes and functions to display the pygame.
 #-----[ MAIN LOOP ]-----
 def main():
+    player1 = Player(3)
     # Iterating variable (controls enemy spawn and background changes)
     counter = 0
     # Empty variable for points (iterated per enemy shot)
@@ -466,17 +469,21 @@ def main():
     clock = pygame.time.Clock()
 
     # -----[ DISPLAY FUNCTION ]-----
-    def display():
+    def display(status):
         # MAIN MENU SCREEN
-        if p1alive == 0 and start == 0:
+        if status["p1alive"] == 0 and status["start"] == 0:
             # Draw background
             WIN.blit(BG, (0, 0))
-            text = font.render("TECH UNIVERSE: Re", True, text_color)
+            text = font.render("TECH UNIVERSE: ", True, text_color)
+            text2 = font.render("Re", True, CYAN)
+            # draw the rectangle (surface, color, [x,y,width,height]
+            pygame.draw.rect(WIN, BLACK, [320, 170, 50, 50])
             # Create coordinates for text
             textRect = text.get_rect()
             textRect.center = (200, 200)
             # Draw text on window
             WIN.blit(text, textRect)
+            WIN.blit(text2, (325, 185))
             #-----[ MAIN MENU BUTTONS ]-----
             # SINGLE PLAYER BUTTON
             # Blit it on screen, default color, x = 400, y = 150, w = 140, h = 40
@@ -484,7 +491,18 @@ def main():
             #  If mouse is over button, draw with secondary color
             if WIDTH / 2 <= mouse[0] <= WIDTH / 2 + 140 and 150 < mouse[1] < 190:
                 pygame.draw.rect(WIN, button_color_2, [WIDTH / 2, 150, 140, 40])
-
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    # -----[ SPAWN PLAYER ]-----
+                    # create player at desired coordinates (400, 360) and add to appropriate sprite groups
+                    #player1 = Player(3)
+                    #global p1alive
+                    status["p1alive"] = 1
+                    asp.add(player1)
+                    ship.add(player1)
+                    player1.rect.x = 400
+                    player1.rect.y = 360
+                    #global start
+                    status["start"] = 1
             # QUIT BUTTON
             # Blit it on screen, default color, x = 400, y = 200, w = 140, h = 40
             pygame.draw.rect(WIN, button_color, [WIDTH / 2, HEIGHT / 2, 140, 40])
@@ -505,8 +523,14 @@ def main():
             # 1-PLAYER TEXT
             WIN.blit(one_player_text, (WIDTH / 2, 156))
 
+            # Making QUIT text blue
+            if WIDTH / 2 <= mouse[0] <= WIDTH / 2 + 140 and HEIGHT / 2 <= mouse[1] <= HEIGHT / 2 + 40:
+                quit_text2 = font.render('quit', True, CYAN)
+                WIN.blit(quit_text2, (WIDTH / 2 + 40, HEIGHT / 2 + 6))
+
+
         #-----[ GAME PROGRESSION ]-----
-        if p1alive == 1 and start == 1:
+        if status["p1alive"] == 1 and status["start"] == 1:
             # Level 1 (BG)
             if counter < 400:
                 WIN.blit(BG, (0, 0))
@@ -516,7 +540,7 @@ def main():
 
 
         # GAME OVER screen
-        if p1alive == 0 and start == 1:
+        if status["p1alive"] == 0 and status["start"] == 1:
             # empty all sprites list
             pygame.sprite.Group.empty(asp)
             # Create text and color it (Boolean makes text clearer I think)
@@ -676,25 +700,12 @@ def main():
                 # Run is set to False; main loop stops
                 run = False
 
-            # SINGLE PLAYER BUTTON FUNCTIONALITY  (HIGHLIGHT)
-            if WIDTH / 2 <= mouse[0] <= WIDTH / 2 + 140 and 150 < mouse[1] < 190:
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    # -----[ SPAWN PLAYER ]-----
-                    # create player at desired coordinates (400, 360) and add to appropriate sprite groups
-                    player1 = Player(3)
-                    global p1alive
-                    p1alive = 1
-                    asp.add(player1)
-                    ship.add(player1)
-                    player1.rect.x = 400
-                    player1.rect.y = 360
-                    global start
-                    start = 1
+
 
             #-----[ PLAYER LASER FIRE BUTTON ]-----
             if event.type == pygame.KEYDOWN:
                 # If the player hits the fire button and has health remaining
-                if event.key == pygame.K_SPACE and p1alive == 1:
+                if event.key == pygame.K_SPACE and status["p1alive"] == 1:
                     # Set laser variable to the Laser class
                     laser = Laser()
                     # Set laser to appear from player's coordinates
@@ -761,7 +772,7 @@ def main():
                     # Remove player from everything
                     player1.kill()
                     # Set player1 alive boolean to false (0)
-                    p1alive = 0
+                    status["p1alive"] = 0
                 # If the player has health remaining:d
                 if player1.health > 0:
                     # Blit the player onto the screen
@@ -786,7 +797,7 @@ def main():
                     player1.kill()
                     asp.remove(player1)
                     ship.remove(player1)
-                    p1alive = 0
+                    status["p1alive"] = 0
                 if player1.health > 0:
                     asp.add(player1)
                     ship.add(player1)
@@ -807,7 +818,7 @@ def main():
                     player1.kill()
                     asp.remove(player1)
                     ship.remove(player1)
-                    p1alive = 0
+                    status["p1alive"] = 0
                 if player1.health > 0:
                     asp.add(player1)
                     ship.add(player1)
@@ -828,7 +839,7 @@ def main():
                     player1.kill()
                     asp.remove(player1)
                     ship.remove(player1)
-                    p1alive = 0
+                    status["p1alive"] = 0
                 if player1.health > 0:
                     asp.add(player1)
                     ship.add(player1)
@@ -849,7 +860,7 @@ def main():
                     player1.kill()
                     asp.remove(player1)
                     ship.remove(player1)
-                    p1alive = 0
+                    status["p1alive"] = 0
                 if player1.health > 0:
                     asp.add(player1)
                     ship.add(player1)
@@ -859,10 +870,10 @@ def main():
 
 
         # Call player movement function
-        if p1alive == 1:
+        if status["p1alive"] == 1:
             player1.move()
         # A constantly iterating variable in place of a time module
-        if p1alive == 1:
+        if status["p1alive"] == 1:
             counter += 1
         else:
             counter == 0
@@ -873,7 +884,7 @@ def main():
         #print(points)
         #print(start)
         #print(points)
-        print(mouse)
+        #print(mouse)
         """if points % 6 == 0 and points != 0 :
             points == 0
             player1.health = 
@@ -882,7 +893,7 @@ def main():
         print("HEALTH: {}".format(player1.health))"""
 
         # While the game is running, call the display function
-        display()
+        display(status)
 
 #=====[ LAUNCH GAME ]=====
 # Calls main loop
