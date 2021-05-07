@@ -122,9 +122,6 @@ enemy = pygame.sprite.Group()
 lasers = pygame.sprite.Group()
 # This creates a pygame group for the bugs' lasers
 blasers = pygame.sprite.Group()
-
-"""COLIN: Since waves aren't being spawned sequentially, the following lists are
-not needed. But I'll keep them for now just in case"""
 # This creates a pygame group for everything spawned in wave 1
 bug1 = pygame.sprite.Group()
 # This creates a pygame group for everything spawned in wave 2
@@ -457,7 +454,6 @@ class Boss(pygame.sprite.Sprite):
 # classes and functions to display the pygame.
 #-----[ MAIN LOOP ]-----
 def main():
-    player1 = Player(3)
     # Iterating variable (controls enemy spawn and background changes)
     counter = 0
     # Empty variable for points (iterated per enemy shot)
