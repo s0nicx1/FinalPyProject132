@@ -471,6 +471,12 @@ def main():
         if p1alive == 0 and start == 0:
             # Draw background
             WIN.blit(BG, (0, 0))
+            text = font.render("TECH UNIVERSE: Re", True, text_color)
+            # Create coordinates for text
+            textRect = text.get_rect()
+            textRect.center = (200, 200)
+            # Draw text on window
+            WIN.blit(text, textRect)
             #-----[ MAIN MENU BUTTONS ]-----
             # SINGLE PLAYER BUTTON
             # Blit it on screen, default color, x = 400, y = 150, w = 140, h = 40
@@ -513,8 +519,6 @@ def main():
         if p1alive == 0 and start == 1:
             # empty all sprites list
             pygame.sprite.Group.empty(asp)
-            # Create a font and font size
-            font = pygame.font.Font(None, 36)
             # Create text and color it (Boolean makes text clearer I think)
             text = font.render("Game OVER!", True, text_color)
             # Create coordinates for text
@@ -525,19 +529,20 @@ def main():
 
             # -----[ QUIT BUTTON ]-----
             # Blit it on screen, default color, x = 400, y = 200, w = 140, h = 40
-            pygame.draw.rect(WIN, button_color, [WIDTH / 2, HEIGHT / 2, 140, 40])
+            pygame.draw.rect(WIN, button_color, [330, 230, 140, 40])
+            pygame.draw.rect(WIN, GREEN, [330, 300, 140, 40])
             # QUIT BUTTON (HIGHLIGHT)
             # If 400 < mouse x coordinate < 540 and 200 < mouse y coordinate < 240
-            if WIDTH / 2 <= mouse[0] <= WIDTH / 2 + 140 and HEIGHT / 2 <= mouse[1] <= HEIGHT / 2 + 40:
+            if 330 <= mouse[0] <= 470 and 230 <= mouse[1] <= 270:
                 # Draw the same button, but use secondary color
-                pygame.draw.rect(WIN, button_color_2, [WIDTH / 2, HEIGHT / 2, 140, 40])
+                pygame.draw.rect(WIN, button_color_2, [330, 230, 140, 40])
                 # If button is pressed while over QUIT BUTTON, Exit game
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pygame.quit()
             # -----[ BUTTON TEXTS ]-----
             """Must be called after button color changes, as it must appear OVER THEM"""
             # QUIT TEXT
-            WIN.blit(quit_text, (WIDTH / 2 + 40, HEIGHT / 2 + 6))
+            WIN.blit(quit_text, (370, 235))
 
         # Draws all of the sprites in the ALL SPRITES group
         asp.draw(WIN)
@@ -868,6 +873,7 @@ def main():
         #print(points)
         #print(start)
         #print(points)
+        print(mouse)
         """if points % 6 == 0 and points != 0 :
             points == 0
             player1.health = 
