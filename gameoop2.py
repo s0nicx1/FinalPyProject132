@@ -82,6 +82,8 @@ GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
 
 #-----[ ON SCREEN BUTTONS ]-----
+BUTTON_H = 40
+BUTTON_W = 150
 # Text color (WHITE)
 text_color = (255, 255, 255)
 # Default button color (LIGHT GREY)
@@ -90,10 +92,14 @@ button_color = (200, 200, 200)
 button_color_2 = (100, 100, 100)
 # Text font and size
 font = pygame.font.Font('8-BitMadness.ttf', 40)
-# QUIT text
-quit_text = font.render('quit', True, text_color)
 # 1-Player text
 one_player_text = font.render('1-Player', True, text_color)
+# 2-Player text
+two_player_text = font.render('2-Player', True, text_color)
+# DIFFICULTY text
+difficulty_text = font.render('difficulty', True, text_color)
+# QUIT text
+quit_text = font.render('quit', True, text_color)
 
 # This list represents the amount of time the Bug Type 2 has fired, and its limits can be adjusted accordingly to match
 # level difficulty
@@ -125,11 +131,18 @@ lasers = pygame.sprite.Group()
 blasers = pygame.sprite.Group()
 # This creates a pygame group for everything spawned in wave 1
 bug1 = pygame.sprite.Group()
-# This creates a pygame group for everything spawned in wave 2
+# This creates a pygame group for everyAthing spawned in wave 2
 bug2 = pygame.sprite.Group()
+<<<<<<< HEAD
 bug3 = pygame.sprite.Group()
 bug4 = pygame.sprite.Group()
 boss1 = pygame.sprite.Group()
+=======
+# This creates a pygame group for everything spawned in wave 1
+bug3 = pygame.sprite.Group()
+# This creates a pygame group for everything spawned in wave 2
+bug4 = pygame.sprite.Group()
+>>>>>>> 7dfd43824cff4afee8919920d7010cb7c347742b
 
 #=====[ CREATE WINDOW ]======
 # Constant variable for window's width (800) and height (400); RPi screen size
@@ -146,6 +159,8 @@ status = {
     "p1alive": 0,
     "start": 0
 }
+
+diff = [1,2,3]
 
 #=====[ CLASSES ]=====
 #-----[ PLAYER SPRITE CLASS ]-----
@@ -462,6 +477,7 @@ class Boss(pygame.sprite.Sprite):
 # classes and functions to display the pygame.
 #-----[ MAIN LOOP ]-----
 def main():
+    # creates a player1 sprite (but doesn't display it just yet)
     player1 = Player(3)
     # Iterating variable (controls enemy spawn and background changes)
     counter = 0
@@ -480,6 +496,8 @@ def main():
         if status["p1alive"] == 0 and status["start"] == 0:
             # Draw background
             WIN.blit(BG, (0, 0))
+
+            # Title text
             text = font.render("TECH UNIVERSE: ", True, text_color)
             text2 = font.render("Re", True, CYAN)
             # draw the rectangle (surface, color, [x,y,width,height]
@@ -490,49 +508,84 @@ def main():
             # Draw text on window
             WIN.blit(text, textRect)
             WIN.blit(text2, (325, 185))
+
             #-----[ MAIN MENU BUTTONS ]-----
-            # SINGLE PLAYER BUTTON
-            # Blit it on screen, default color, x = 400, y = 150, w = 140, h = 40
-            pygame.draw.rect(WIN, button_color, [WIDTH / 2, 150, 140, 40])
-            #  If mouse is over button, draw with secondary color
+
+            # [SINGLE PLAYER BUTTON]
+            # Blit it on screen, default color, x = 400, y = 150, w = 150, h = 40
+            pygame.draw.rect(WIN, button_color, [WIDTH / 2, 150, BUTTON_W, BUTTON_H])
+            # If mouse is over button, draw with secondary color
             if WIDTH / 2 <= mouse[0] <= WIDTH / 2 + 140 and 150 < mouse[1] < 190:
-                pygame.draw.rect(WIN, button_color_2, [WIDTH / 2, 150, 140, 40])
+                pygame.draw.rect(WIN, button_color_2, [WIDTH / 2, 150, BUTTON_W, BUTTON_H])
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    # -----[ SPAWN PLAYER ]-----
-                    # create player at desired coordinates (400, 360) and add to appropriate sprite groups
-                    #player1 = Player(3)
-                    #global p1alive
+                    # -----[ SPAWN PLAYER 1]-----
                     status["p1alive"] = 1
                     asp.add(player1)
                     ship.add(player1)
                     player1.rect.x = 400
                     player1.rect.y = 360
-                    #global start
                     status["start"] = 1
-            # QUIT BUTTON
-            # Blit it on screen, default color, x = 400, y = 200, w = 140, h = 40
-            pygame.draw.rect(WIN, button_color, [WIDTH / 2, HEIGHT / 2, 140, 40])
 
+            # [CO-OP BUTTON]
+            # Blit it on screen, default color, x = 400, y = 150, w = 150, h = 40
+            pygame.draw.rect(WIN, button_color, [WIDTH / 2, HEIGHT / 2, BUTTON_W, BUTTON_H])
             # QUIT BUTTON (HIGHLIGHT)
-            # If 400 < mouse x coordinate < 540 and 200 < mouse y coordinate < 240
+            # If mouse is over button, draw with secondary color
             if WIDTH / 2 <= mouse[0] <= WIDTH / 2 + 140 and HEIGHT / 2 <= mouse[1] <= HEIGHT / 2 + 40:
                 # Draw the same button, but use secondary color
-                pygame.draw.rect(WIN, button_color_2, [WIDTH / 2, HEIGHT / 2, 140, 40])
+                pygame.draw.rect(WIN, button_color_2, [WIDTH / 2, HEIGHT / 2, BUTTON_W, BUTTON_H])
+                # If button is pressed while over button, que appropriate action.
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    print("THIS IS A BUTTON")
+
+            # [QUIT BUTTON]
+            # Blit it on screen, default color, x = 400, y = 150, w = 150, h = 40
+            pygame.draw.rect(WIN, button_color, [WIDTH / 2, 250, BUTTON_W, BUTTON_H])
+            # QUIT BUTTON (HIGHLIGHT)
+            # If mouse is over button, draw with secondary color
+            if WIDTH / 2 <= mouse[0] <= WIDTH / 2 + 140 and 250 <= mouse[1] <= 290:
+                # Draw the same button, but use secondary color
+                pygame.draw.rect(WIN, button_color_2, [WIDTH / 2, 250, BUTTON_W, BUTTON_H])
                 # If button is pressed while over QUIT BUTTON, Exit game
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pygame.quit()
 
+            # [DIFFICULTY BUTTON]
+            # Blit it on screen, default color, x = 600, y = 200, w = 150, h = 40
+            pygame.draw.rect(WIN, button_color, [WIDTH / 2 + 200, 200, BUTTON_W + 20, BUTTON_H])
+            # DIFFICULTY BUTTON (HIGHLIGHT)
+            # If mouse is over button, draw with secondary color
+            if 600 <= mouse[0] <= 750 and 200 <= mouse[1] <= 240:
+                # Draw the same button, but use secondary color
+                pygame.draw.rect(WIN, button_color_2, [600, 200, BUTTON_W + 20, BUTTON_H])
+                # If button is pressed while over QUIT BUTTON, Exit game
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    """COLIN: A LIST THAT INCREMENTS WHEN CLICKED BUT CAN GET LONGER THAN ITS DEFAULT LENGTH"""
+                    print("THIS IS ALSO A BUTTON")
+
+
             # -----[ BUTTON TEXTS ]-----
             """Must be called after button color changes, as it must appear OVER THEM"""
-            # QUIT TEXT
-            WIN.blit(quit_text, (WIDTH / 2 + 40, HEIGHT / 2 + 6))
             # 1-PLAYER TEXT
-            WIN.blit(one_player_text, (WIDTH / 2, 156))
+            WIN.blit(one_player_text, (WIDTH / 2, 150 + 6))
+            # 2- PLAYER TEXT
+            WIN.blit(two_player_text, (WIDTH / 2, HEIGHT / 2 + 6))
+            # QUIT TEXT
+            WIN.blit(quit_text, (WIDTH / 2 + 40, 250 + 6))
+            # DIFFICULTY TEXT
+            WIN.blit(difficulty_text, (WIDTH / 2 + 200, HEIGHT/2 + 6))
+            # DIFFICULTY BUTTON (HIGHLIGHT)
+            # If mouse is over button, draw with secondary color
+            if 600 <= mouse[0] <= 750 and 200 <= mouse[1] <= 240:
+                # Draw the same button, but use secondary color
+                pygame.draw.rect(WIN, button_color_2, [600, 200, BUTTON_W + 20, BUTTON_H])
+                # If button is pressed while over QUIT BUTTON, Exit game
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    """COLIN: A LIST THAT INCREMENTS WHEN CLICKED BUT CAN GET LONGER THAN ITS DEFAULT LENGTH"""
+                    print("THIS IS ALSO A BUTTON")
 
-            # Making QUIT text blue
-            if WIDTH / 2 <= mouse[0] <= WIDTH / 2 + 140 and HEIGHT / 2 <= mouse[1] <= HEIGHT / 2 + 40:
-                quit_text2 = font.render('quit', True, CYAN)
-                WIN.blit(quit_text2, (WIDTH / 2 + 40, HEIGHT / 2 + 6))
+
+
 
 
         #-----[ GAME PROGRESSION ]-----
@@ -841,11 +894,11 @@ def main():
                     pygame.time.delay(100)
 
         #-----[ BUG TYPE 1 / PLAYER SHIP COLLISION ]------
-        for b1 in enemy:
+        for b1 in bug1:
             crash = pygame.sprite.spritecollide(b1, ship, False)
             for player1 in crash:
-                enemy.remove(b3)
-                asp.remove(b3)
+                enemy.remove(b1)
+                asp.remove(b1)
                 player1.health -= 1
                 print("OUCH!")
                 pygame.mixer.Sound.play(HIT)
@@ -862,7 +915,7 @@ def main():
                     player1.rect.y = 360
 
         #-----[ BUG TYPE 2 / PLAYER SHIP COLLISION ]------
-        for b2 in enemy:
+        for b2 in bug2:
             crash = pygame.sprite.spritecollide(b2, ship, False)
             for player1 in crash:
                 player1.health -= 1
@@ -883,7 +936,7 @@ def main():
                     player1.rect.y = 360
 
         #-----[ BUG TYPE 3 / PLAYER SHIP COLLISION ]------
-        for b3 in enemy:
+        for b3 in bug3:
             crash = pygame.sprite.spritecollide(b3, ship, False)
             for player1 in crash:
                 player1.health -= 1
@@ -904,7 +957,7 @@ def main():
                     player1.rect.y = 360
 
         #-----[ BUG TYPE 4 / PLAYER SHIP COLLISION ]------
-        for b4 in enemy:
+        for b4 in bug4:
             crash = pygame.sprite.spritecollide(b4, ship, False)
             for player1 in crash:
                 player1.health -= 1
@@ -923,7 +976,6 @@ def main():
                     # Put player back at starting coordinates
                     player1.rect.x = 400
                     player1.rect.y = 360
-
 
         # Call player movement function
         if status["p1alive"] == 1:
