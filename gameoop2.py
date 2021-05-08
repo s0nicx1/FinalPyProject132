@@ -1,13 +1,7 @@
 """
-COLIN: So far this version of our project contains:
-- Player sprite (Movement and firing ability)
-- Two types of enemy sprites (Bug Type 1 and Bug Type 2, both with movement and firing abilities)
-- Basic collision between corresponding sprites and lasers (No health system)
-COLIN: But it also lacks:
-- A Main Menu with game options  (1 player, 2 player co-op,(2 player versus??), Difficulties)
+COLIN: it lacks:
 - Co-op
-- Level/Difficulty escalation
-- Final Boss
+- An actual game
 - Music exclusive to main menu?
 - A box to put it all in
 """
@@ -78,6 +72,8 @@ RED = (255, 0, 0)
 CYAN = (0, 255, 255)
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
+YELLOW = (255,255,0)
+
 
 #-----[ ON SCREEN BUTTONS ]-----
 BUTTON_H = 40
@@ -95,7 +91,14 @@ one_player_text = font.render('1-Player', True, text_color)
 # 2-Player text
 two_player_text = font.render('2-Player', True, text_color)
 # DIFFICULTY text
-difficulty_text = font.render('difficulty', True, text_color)
+"""difficulty_text = font.render('difficulty', True, text_color)
+easy_text1 = font.render('easy', True, text_color)
+med_text1 = font.render('medium', True, text_color)
+hard_text1 = font.render('hard', True, text_color)
+easy_text2 = font.render('easy', True, GREEN)
+med_text2 = font.render('medium', True, YELLOW)
+hard_text2 = font.render('hard', True, RED)"""
+
 # QUIT text
 quit_text = font.render('quit', True, text_color)
 
@@ -155,7 +158,7 @@ status = {
 }
 
 # Attempt to start a list for difficulty
-diff = [1,2,3]
+
 
 #=====[ CLASSES ]=====
 #-----[ PLAYER SPRITE CLASS ]-----
@@ -491,7 +494,6 @@ class Boss(pygame.sprite.Sprite):
             asp.add(blaser)
             blasers.add(blaser)
 
-
 #-----[ BOSS LASER SPRITE CLASS ]-----
 class BOSSLaser(pygame.sprite.Sprite):
     def __init__(self):
@@ -570,12 +572,12 @@ def main():
             pygame.draw.rect(WIN, button_color, [WIDTH / 2, HEIGHT / 2, BUTTON_W, BUTTON_H])
             # QUIT BUTTON (HIGHLIGHT)
             # If mouse is over button, draw with secondary color
-            if WIDTH / 2 <= mouse[0] <= WIDTH / 2 + 140 and HEIGHT / 2 <= mouse[1] <= HEIGHT / 2 + 40:
+            if (WIDTH / 2 <= mouse[0] <= WIDTH / 2 + 140) and (HEIGHT / 2 <= mouse[1] <= HEIGHT / 2 + 40):
                 # Draw the same button, but use secondary color
                 pygame.draw.rect(WIN, button_color_2, [WIDTH / 2, HEIGHT / 2, BUTTON_W, BUTTON_H])
                 # If button is pressed while over button, que appropriate action.
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    print("THIS IS A BUTTON")
+                    print("THIS IS A BUTTON\n")
 
             # [QUIT THE GAME BUTTON]
             # Blit it on screen, default color, x = 400, y = 150, w = 150, h = 40
@@ -589,18 +591,33 @@ def main():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pygame.quit()
 
-            # [DIFFICULTY BUTTON]
+            """# [DIFFICULTY BUTTON]
             # Blit it on screen, default color, x = 600, y = 200, w = 150, h = 40
+            pygame.draw.rect(WIN, button_color, [WIDTH / 2 + 200, 150, BUTTON_W + 20, BUTTON_H])
             pygame.draw.rect(WIN, button_color, [WIDTH / 2 + 200, 200, BUTTON_W + 20, BUTTON_H])
+            pygame.draw.rect(WIN, button_color, [WIDTH / 2 + 200, 250, BUTTON_W + 20, BUTTON_H])
             # DIFFICULTY BUTTON (HIGHLIGHT)
             # If mouse is over button, draw with secondary color
-            if 600 <= mouse[0] <= 750 and 200 <= mouse[1] <= 240:
+            if 600 <= mouse[0] <= 770 and 150 <= mouse[1] <= 190:
+                pygame.draw.rect(WIN, button_color_2, [WIDTH / 2 + 200, 150, BUTTON_W + 20, BUTTON_H])
                 # Draw the same button, but use secondary color
-                pygame.draw.rect(WIN, button_color_2, [600, 200, BUTTON_W + 20, BUTTON_H])
                 # If button is pressed while over QUIT BUTTON, Exit game
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    """COLIN: A LIST THAT INCREMENTS WHEN CLICKED BUT CAN GET LONGER THAN ITS DEFAULT LENGTH"""
-                    print("THIS IS ALSO A BUTTON")
+                    status["difficulty"] = 0
+            if 600 <= mouse[0] <= 770 and 200 <= mouse[1] <= 240:
+                pygame.draw.rect(WIN, button_color_2, [WIDTH / 2 + 200, 200, BUTTON_W + 20, BUTTON_H])
+                # Draw the same button, but use secondary color
+                # If button is pressed while over QUIT BUTTON, Exit game
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    status["difficulty"] = 1
+            if 600 <= mouse[0] <= 770 and 250 <= mouse[1] <= 290:
+                pygame.draw.rect(WIN, button_color_2, [WIDTH / 2 + 200, 250, BUTTON_W + 20, BUTTON_H])
+                # Draw the same button, but use secondary color
+                # If button is pressed while over QUIT BUTTON, Exit game
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    status["difficulty"] = 2
+"""
+
 
 
             # -----[ BUTTON TEXTS ]-----
@@ -611,8 +628,12 @@ def main():
             WIN.blit(two_player_text, (WIDTH / 2, HEIGHT / 2 + 6))
             # QUIT TEXT
             WIN.blit(quit_text, (WIDTH / 2 + 40, 250 + 6))
-            # DIFFICULTY TEXT
-            WIN.blit(difficulty_text, (WIDTH / 2 + 200, HEIGHT/2 + 6))
+            """# DIFFICULTY TEXT
+            WIN.blit(easy_text1, (600 + 30, 156))
+            WIN.blit(med_text1, (600 + 30, 206))
+            WIN.blit(hard_text1, (600 + 30, 256))
+"""
+
 
         #-----[ GAME PROGRESSION ]-----
         if status["p1alive"] == 1 and status["start"] == 1:
@@ -786,6 +807,18 @@ def main():
     while run:
         # track mouse
         mouse = pygame.mouse.get_pos()
+
+        # Some troubleshooting texts
+        # print(status["counter"])
+        #print(mouse)
+        # print(status["difficulty"])
+        # print("POINTS: {}".format(status["points"]))
+        # print("HEALTH: {}".format(player1.health))
+        # print(len(blasers))
+        # print(len(ship))
+        #print("STATUS: {}".format(status["difficulty"]))
+
+
         # Sets the game to reset at the desired frames per second
         clock.tick(FPS)
 
@@ -1025,16 +1058,7 @@ def main():
         if status["counter"] == 0:
             player1.health = 3
 
-        # Some troubleshooting texts
-        #print(p1alive)
-        #print(status["counter"])
 
-        #print(start)a
-
-        #print(mouse)
-        #print("POINTS: {}".format(status["points"]))
-        #print("HEALTH: {}".format(player1.health))
-        #print(len(blasers))
         # While the game is running, call the display function
         display(status)
 
