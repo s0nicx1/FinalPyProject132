@@ -5,12 +5,10 @@ COLIN: So far this version of our project contains:
 - Basic collision between corresponding sprites and lasers (No health system)
 COLIN: But it also lacks:
 - A Main Menu with game options  (1 player, 2 player co-op,(2 player versus??), Difficulties)
-- Sprite lives/health
-- Co-op and Versus???
+- Co-op
 - Level/Difficulty escalation
-- Final Boss?
+- Final Boss
 - Music exclusive to main menu?
-- Arcade button compatibility
 - A box to put it all in
 """
 
@@ -148,11 +146,15 @@ pygame.display.set_caption("Tech Universe: Re")
 WIDTH = WIN.get_width()
 HEIGHT = WIN.get_height()
 
+# Dictionary that keeps and updates game variables
 status = {
     "p1alive": 0,
-    "start": 0
+    "start": 0,
+    "counter": 0,
+    "points": 0,
 }
 
+# Attempt to start a list for difficulty
 diff = [1,2,3]
 
 #=====[ CLASSES ]=====
@@ -446,7 +448,7 @@ class BugT4(pygame.sprite.Sprite):
 
 #-----[ BOSS SPRITE CLASS ]-----
 class Boss(pygame.sprite.Sprite):
-    def __init__(self,health):
+    def __init__(self, health):
         # Calls pygame's sprite class
         super().__init__()
         # Grabs the predefined variable from up top that represents the bug's image
@@ -461,9 +463,53 @@ class Boss(pygame.sprite.Sprite):
 
     # Update the sprite's movement
     def update(self):
-        # Go down the screen until y coordinate == 200
+        # Go down the screen until y coordinate == 50
         if self.rect.y != 50:
             self.rect.y += 1
+        if self.rect.y == 50:
+            blaser = BOSSLaser()
+            blaser.rect.x = 265
+            blaser.rect.y = 180
+            asp.add(blaser)
+            blasers.add(blaser)
+
+            blaser = BOSSLaser()
+            blaser.rect.x = 525
+            blaser.rect.y = 180
+            asp.add(blaser)
+            blasers.add(blaser)
+
+            blaser = BOSSLaser()
+            blaser.rect.x = 345
+            blaser.rect.y = 180
+            asp.add(blaser)
+            blasers.add(blaser)
+
+            blaser = BOSSLaser()
+            blaser.rect.x = 450
+            blaser.rect.y = 180
+            asp.add(blaser)
+            blasers.add(blaser)
+
+
+#-----[ BOSS LASER SPRITE CLASS ]-----
+class BOSSLaser(pygame.sprite.Sprite):
+    def __init__(self):
+        # Calls pygame's sprite class
+        super().__init__()
+        # Creates a rectangle with width and height of 4 and fills it with predefined color RED
+        self.image = pygame.Surface([10,80])
+        self.image.fill(CYAN)
+        # Creates a rectangle (hitbox) for the sprite and tracks its coordinates
+        self.rect = self.image.get_rect()
+
+    # Updates the sprite's movements
+    def update(self):
+        # Move the bug's laser down
+        self.rect.y += 3
+        # Delete the laser if it reaches bottom of screen
+        if self.rect.y > 400:
+            self.kill()
 
 #=====[ MAIN GAME LOOP ]=====
 # COLIN: Here is where the game is run. It sets up the foundation of the pygame, then refers to several
@@ -473,9 +519,9 @@ def main():
     # creates a player1 sprite (but doesn't display it just yet)
     player1 = Player(3)
     # Iterating variable (controls enemy spawn and background changes)
-    counter = 0
+    status["counter"] = 0
     # Empty variable for points (iterated per enemy shot)
-    points = 0
+    status["points"] = 0
     # Run set to True so the game doesn't end
     run = True
     # Sets the Frame Rate (RPi friendly)
@@ -489,7 +535,6 @@ def main():
         if status["p1alive"] == 0 and status["start"] == 0:
             # Draw background
             WIN.blit(BG, (0, 0))
-
             # Title text
             text = font.render("TECH UNIVERSE: ", True, text_color)
             text2 = font.render("Re", True, CYAN)
@@ -512,6 +557,7 @@ def main():
                 pygame.draw.rect(WIN, button_color_2, [WIDTH / 2, 150, BUTTON_W, BUTTON_H])
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     # -----[ SPAWN PLAYER 1]-----
+                    player1.health = 3
                     status["p1alive"] = 1
                     asp.add(player1)
                     ship.add(player1)
@@ -531,7 +577,7 @@ def main():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     print("THIS IS A BUTTON")
 
-            # [QUIT BUTTON]
+            # [QUIT THE GAME BUTTON]
             # Blit it on screen, default color, x = 400, y = 150, w = 150, h = 40
             pygame.draw.rect(WIN, button_color, [WIDTH / 2, 250, BUTTON_W, BUTTON_H])
             # QUIT BUTTON (HIGHLIGHT)
@@ -571,17 +617,26 @@ def main():
         #-----[ GAME PROGRESSION ]-----
         if status["p1alive"] == 1 and status["start"] == 1:
             # Level 1 (BG)
-            if counter < 400:
+            if status["counter"] < 400:
                 WIN.blit(BG, (0, 0))
             # Level 2 (BG2)
-            if counter > 400:
+            if status["counter"] > 400:
                 WIN.blit(BG4, (0, 0))
 
 
         # GAME OVER screen
         if status["p1alive"] == 0 and status["start"] == 1:
-            # empty all sprites list
+            # empty all the sprites list
             pygame.sprite.Group.empty(asp)
+            pygame.sprite.Group.empty(ship)
+            pygame.sprite.Group.empty(lasers)
+            pygame.sprite.Group.empty(blasers)
+            pygame.sprite.Group.empty(bug1)
+            pygame.sprite.Group.empty(bug2)
+            pygame.sprite.Group.empty(bug3)
+            pygame.sprite.Group.empty(bug4)
+            pygame.sprite.Group.empty(boss1)
+
             # Create text and color it (Boolean makes text clearer I think)
             text = font.render("Game OVER!", True, text_color)
             # Create coordinates for text
@@ -590,7 +645,7 @@ def main():
             # Draw text on window
             WIN.blit(text, textRect)
 
-            # -----[ QUIT BUTTON ]-----
+            # -----[ QUIT TO MAIN MENU BUTTON ]-----
             # Blit it on screen, default color, x = 400, y = 200, w = 140, h = 40
             pygame.draw.rect(WIN, button_color, [330, 230, 140, 40])
             pygame.draw.rect(WIN, GREEN, [330, 300, 140, 40])
@@ -601,7 +656,12 @@ def main():
                 pygame.draw.rect(WIN, button_color_2, [330, 230, 140, 40])
                 # If button is pressed while over QUIT BUTTON, Exit game
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    pygame.quit()
+                    status["p1alive"] = 0
+                    status["start"] = 0
+                    status["counter"] = 0
+                    status["points"] = 0
+
+
             # -----[ BUTTON TEXTS ]-----
             """Must be called after button color changes, as it must appear OVER THEM"""
             # QUIT TEXT
@@ -620,7 +680,7 @@ def main():
         # This function is called immediately upon game's launch. After, conditionals will run the game
         def spawn():
             # WAVE 1 (20 BT1's)
-            if counter == 3:
+            if status["counter"] == 3:
 
                 # Incrementer for space between sprites
                 b = 0
@@ -639,7 +699,7 @@ def main():
 
 
             # WAVE 2 (20 BT1's, 10 BT2's)
-            if counter == 500:
+            if status["counter"] == 500:
                 # Incrementer for space between sprites
                 b = 20
                 # Spawn 20 BT1's
@@ -669,14 +729,13 @@ def main():
                     b2.rect.y = -100
                     s += 1
 
-            if counter == 1200:
+            if status["counter"] == 1200:
                 # Bug Type 3's
                 for i in range(1, 10):
                     # Create Bug Type 3's
                     b3 = BugT3(1)
                     # Add them to appropriate lists
                     asp.add(b3)
-                    enemy.add(b3)
                     bug3.add(b3)
                     # Chooses a random integer between 1,2
                     spawn = random.randint(1, 100)
@@ -696,17 +755,16 @@ def main():
                     b4 = BugT4(1)
                     # Add sprites to all appropriate lists
                     asp.add(b4)
-                    enemy.add(b4)
+
                     bug4.add(b4)
                     # Spawn at x coordinate 0, a y coordinate 80 pixels from other sprites, and increment incrementer
                     b4.rect.x = 0
                     b4.rect.y = 80 * q
                     q += 1
 
-            if counter == 1400:
+            if status["counter"] == 1400:
                 boss = Boss(40)
                 asp.add(boss)
-                enemy.add(boss)
                 boss1.add(boss)
                 boss.rect.x = 250
                 boss.rect.y = 0
@@ -771,7 +829,7 @@ def main():
                 if b1.health <= 0:
                     # Remove player from everything
                     b1.kill()
-                    points += 1
+                    status["points"] += 1
 
         #-----[ SHIP LASERS / BUG 2 COLLISION ]-----
         # Create a list that removes laser and enemy once they collide
@@ -787,7 +845,7 @@ def main():
                 if b2.health <= 0:
                     # Remove player from everything
                     b2.kill()
-                    points += 2
+                    status["points"] += 2
                 # If the player has health remaining:
                 if b2.health > 0:
                     # Blit the player onto the screen
@@ -809,7 +867,7 @@ def main():
                 if b3.health <= 0:
                     # Remove player from everything
                     b3.kill()
-                    points += 1
+                    status["points"] += 1
 
         # -----[ SHIP LASERS / BUG 4 COLLISION ]-----
         # Create a list that removes laser and enemy once they collide
@@ -825,7 +883,7 @@ def main():
                 if b4.health <= 0:
                     # Remove player from everything
                     b4.kill()
-                    points += 1
+                    status["points"] += 1
 
         # -----[ SHIP LASERS / BOSS COLLISION ]-----
         # Create a list that removes laser and enemy once they collide
@@ -841,7 +899,7 @@ def main():
                 if boss.health <= 0:
                     # Remove player from everything
                     boss.kill()
-                    points += 1
+                    status["points"] += 1
 
         #-----[ BUG'S LASERS / PLAYER(S) COLLISION ]-----
         """COLIN: Slight issue. The bugs' lasers disappear whenever they reach the player's last location after
@@ -877,8 +935,8 @@ def main():
         for b1 in bug1:
             crash = pygame.sprite.spritecollide(b1, ship, False)
             for player1 in crash:
-                enemy.remove(b1)
                 asp.remove(b1)
+                bug1.remove(b1)
                 player1.health -= 1
                 print("OUCH!")
                 pygame.mixer.Sound.play(HIT)
@@ -920,8 +978,8 @@ def main():
             for player1 in crash:
                 player1.health -= 1
                 print("OUCH!")
-                enemy.remove(b3)
                 asp.remove(b3)
+                bug3.remove(b3)
                 pygame.mixer.Sound.play(HIT)
                 if player1.health <= 0:
                     player1.kill()
@@ -941,8 +999,8 @@ def main():
             for player1 in crash:
                 player1.health -= 1
                 print("OUCH!")
-                enemy.remove(b4)
                 asp.remove(b4)
+                bug4.remove(b4)
                 pygame.mixer.Sound.play(HIT)
                 if player1.health <= 0:
                     player1.kill()
@@ -957,30 +1015,27 @@ def main():
                     player1.rect.y = 360
 
         # Call player movement function
-        if status["p1alive"] == 1:
+        if status["p1alive"] == 1 and status["start"] == 1:
             player1.move()
         # A constantly iterating variable in place of a time module
-        if status["p1alive"] == 1:
-            counter += 1
+        if status["p1alive"] == 1 and status["start"] == 1:
+            status["counter"] += 1
         else:
-            counter == 0
+            status["counter"] == 0
+        # Makes sure player has health at beginning of game
+        if status["counter"] == 0:
+            player1.health = 3
 
         # Some troubleshooting texts
         #print(p1alive)
-        #print(counter)
-        #print(points)
-        #print(start)
-        #print(points)
+        #print(status["counter"])
+
+        #print(start)a
+
         #print(mouse)
-
-        """if points == 6:
-            for i in range(1, 1):
-                points == 0
-                player1.health += 1"""
-
-        #print("POINTS: {}".format(points))
+        #print("POINTS: {}".format(status["points"]))
         #print("HEALTH: {}".format(player1.health))
-
+        #print(len(blasers))
         # While the game is running, call the display function
         display(status)
 
