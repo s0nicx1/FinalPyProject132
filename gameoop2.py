@@ -160,6 +160,8 @@ status = {
     "start": 0,
     # Key to show if co-op was selected
     "coop": 0,
+    # Key to track if ending boss' healh == 0
+    "bossdead": 0,
     # Keys that iterate
     "counter": 0,
     "points": 0,
@@ -519,6 +521,7 @@ class Boss(pygame.sprite.Sprite):
 
     # Update the sprite's movement
     def update(self):
+
         # Go down the screen until y coordinate == 50
         if self.rect.y != 50:
             self.rect.y += 1
@@ -690,6 +693,7 @@ def main():
         #-----[ GAME OVER ]-----
         # SOLO:
         if status["coop"] == 0:
+            # PLAYER LOSES:
             if status["p1alive"] == 0 and status["start"] == 1:
                 # empty all the sprites list
                 pygame.sprite.Group.empty(asp)
@@ -729,14 +733,61 @@ def main():
                         status["start"] = 0
                         status["counter"] = 0
                         status["points"] = 0
+                        status["bossdead"] = 0
+                # -----[ BUTTON TEXTS ]-----
+                """Must be called after button color changes, as it must appear OVER THEM"""
+                # QUIT TEXT
+                WIN.blit(quit_text, (370, 305))
 
+        if status["coop"] == 0:
+            # PLAYER WINS!!!
+            if status["bossdead"] == 1 and status["start"] == 1:
+                # empty all the sprites list
+                pygame.sprite.Group.empty(asp)
+                pygame.sprite.Group.empty(ship)
+                pygame.sprite.Group.empty(lasers)
+                pygame.sprite.Group.empty(blasers)
+                pygame.sprite.Group.empty(bug1)
+                pygame.sprite.Group.empty(bug2)
+                pygame.sprite.Group.empty(bug3)
+                pygame.sprite.Group.empty(bug4)
+                pygame.sprite.Group.empty(boss1)
 
+                # Create text and color it (Boolean makes text clearer I think)
+                text = font.render("CONGRATULATIONS!", True, text_color)
+                # Create coordinates for text
+                textRect = text.get_rect()
+                textRect.center = (400, 200)
+                # Draw text on window
+                WIN.blit(text, textRect)
+
+                score = font.render(" SCORE: {}".format(status["points"]),True, RED)
+                scoreRect = score.get_rect()
+                scoreRect.center = (400,250)
+                WIN.blit(score,scoreRect)
+
+                # -----[ QUIT TO MAIN MENU BUTTON ]-----
+                # Blit it on screen, default color, x = 400, y = 200, w = 140, h = 40
+                pygame.draw.rect(WIN, button_color, [330, 300, 140, 40])
+                # QUIT BUTTON (HIGHLIGHT)
+                # If 400 < mouse x coordinate < 540 and 200 < mouse y coordinate < 240
+                if 330 <= mouse[0] <= 470 and 300 <= mouse[1] <= 340:
+                    # Draw the same button, but use secondary color
+                    pygame.draw.rect(WIN, button_color_2, [330, 300, 140, 40])
+                    # If button is pressed while over QUIT BUTTON, Exit game
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        status["p1alive"] = 0
+                        status["start"] = 0
+                        status["counter"] = 0
+                        status["points"] = 0
+                        status["bossdead"] = 0
                 # -----[ BUTTON TEXTS ]-----
                 """Must be called after button color changes, as it must appear OVER THEM"""
                 # QUIT TEXT
                 WIN.blit(quit_text, (370, 305))
         # CO-OP:
         if status["coop"] == 1:
+            # PLAYERS LOSE:
             if status["p1alive"] == 0 and status["p2alive"] == 0 and status["start"] == 1:
                 # empty all the sprites list
                 pygame.sprite.Group.empty(asp)
@@ -779,12 +830,63 @@ def main():
                         status["counter"] = 0
                         status["points"] = 0
                         status["coop"] = 0
+                        status["bossdead"] = 0
 
                 # -----[ BUTTON TEXTS ]-----
                 """Must be called after button color changes, as it must appear OVER THEM"""
                 # QUIT TEXT
                 WIN.blit(quit_text, (370, 305))
+        # CO-OP:
+        if status["coop"] == 1:
+            # PLAYERS WIN!!!:
+            if status["bossdead"] == 1 and status["start"] == 1:
+                # empty all the sprites list
+                pygame.sprite.Group.empty(asp)
+                pygame.sprite.Group.empty(ship1)
+                pygame.sprite.Group.empty(ship2)
+                pygame.sprite.Group.empty(lasers)
+                pygame.sprite.Group.empty(blasers)
+                pygame.sprite.Group.empty(bug1)
+                pygame.sprite.Group.empty(bug2)
+                pygame.sprite.Group.empty(bug3)
+                pygame.sprite.Group.empty(bug4)
+                pygame.sprite.Group.empty(boss1)
 
+                # Create text and color it (Boolean makes text clearer I think)
+                text = font.render("CONGRATS!", True, text_color)
+                # Create coordinates for text
+                textRect = text.get_rect()
+                textRect.center = (400, 200)
+                # Draw text on window
+                WIN.blit(text, textRect)
+
+                score = font.render(" SCORE: {}".format(status["points"]), True, RED)
+                scoreRect = score.get_rect()
+                scoreRect.center = (400, 250)
+                WIN.blit(score, scoreRect)
+
+                # -----[ QUIT TO MAIN MENU BUTTON ]-----
+                # Blit it on screen, default color, x = 400, y = 200, w = 140, h = 40
+                pygame.draw.rect(WIN, button_color, [330, 300, 140, 40])
+                # QUIT BUTTON (HIGHLIGHT)
+                # If 400 < mouse x coordinate < 540 and 200 < mouse y coordinate < 240
+                if 330 <= mouse[0] <= 470 and 300 <= mouse[1] <= 340:
+                    # Draw the same button, but use secondary color
+                    pygame.draw.rect(WIN, button_color_2, [330, 300, 140, 40])
+                    # If button is pressed while over QUIT BUTTON, Exit game
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        status["p1alive"] = 0
+                        status["p2alive"] = 0
+                        status["start"] = 0
+                        status["counter"] = 0
+                        status["points"] = 0
+                        status["coop"] = 0
+                        status["bossdead"] = 0
+
+                # -----[ BUTTON TEXTS ]-----
+                """Must be called after button color changes, as it must appear OVER THEM"""
+                # QUIT TEXT
+                WIN.blit(quit_text, (370, 305))
         # Draws all of the sprites in the ALL SPRITES group
         asp.draw(WIN)
         # Calls the update function from any sprites in the ALL SPRITES group
@@ -1048,7 +1150,8 @@ def main():
                 if boss.health <= 0:
                     # Remove player from everything
                     boss.kill()
-                    status["points"] += 1
+                    status["bossdead"] = 1
+                    status["points"] += 100
 
         #-----[ BUG'S LASERS / PLAYER(S) COLLISION ]-----
         # SOLO:
