@@ -63,7 +63,7 @@ BOSS = pygame.transform.scale(BOSS, (300, 150))
 
 # Grab image for background
 BG = pygame.image.load("space.jpg")
-BG2 = pygame.image.load("space2.png")
+#BG2 = pygame.image.load("space2.png")
 BG3 = pygame.image.load("space3.png")
 BG4 = pygame.image.load("space4.png")
 
@@ -116,12 +116,10 @@ BUG1_FIRE = 110
 
 # Connects LEDS to pins
 leds = [13,16,17]
-# Attempt to get buttons connected to pins
-but = [20,27]
+
 # Set up broadcom
 GPIO.setmode(GPIO.BCM)
-# Attempt to set up buttons
-GPIO.setup(but, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+
 # Set up LED's
 GPIO.setup(leds,GPIO.OUT)
 
