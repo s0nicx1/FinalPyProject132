@@ -66,7 +66,6 @@ BUZZ = pygame.mixer.Sound("buzz.wav")
 #=====[ VARIABLES AND LISTS ]=====
 # Constant variable representing a movement speed of 5 pixels for the player sprite(s)
 PIX = 5
-
 # The following constant variables represent RGB values for colors
 RED = (255, 0, 0)
 CYAN = (0, 255, 255)
@@ -75,7 +74,9 @@ BLACK = (0, 0, 0)
 YELLOW = (255,255,0)
 
 #-----[ ON SCREEN BUTTONS ]-----
+# Constant variable for button (rectangle) height
 BUTTON_H = 40
+# Constant variable for button (rectangle) width
 BUTTON_W = 150
 # Text color (WHITE)
 text_color = (255, 255, 255)
@@ -286,6 +287,9 @@ class BugT1(pygame.sprite.Sprite):
             # Move from off screen
             if self.rect.x < L_EDGE and self.rect.y == 0:
                 self.rect.x += BUG1_MOV1
+            if self.rect.x > R_EDGE and self.rect.y == 0:
+                self.rect.x -= BUG1_MOV1
+
             # Go right
             if self.rect.x >= L_EDGE and self.rect.y == 0:
                 self.rect.x += BUG1_MOV1
@@ -584,7 +588,7 @@ def main():
     # -----[ DISPLAY FUNCTION ]-----
     def display(status):
 
-        # MAIN MENU SCREEN
+        #-----[ MAIN MENU ]-----
         if status["p1alive"] == 0 and status["start"] == 0:
             # Draw background
             WIN.blit(BG, (0, 0))
@@ -663,8 +667,8 @@ def main():
             # QUIT TEXT
             WIN.blit(quit_text, (WIDTH / 2 + 40, 250 + 6))
 
-
         #-----[ GAME PROGRESSION ]-----
+        # SOLO:
         if status["coop"] == 0:
             if status["p1alive"] == 1 and status["start"] == 1:
                 # Level 1 (BG)
@@ -673,7 +677,7 @@ def main():
                 # Level 2 (BG2)
                 if status["counter"] > 400:
                     WIN.blit(BG4, (0, 0))
-
+        # CO-OP:
         if status["coop"] == 1:
             if status["p1alive"] == 1 or status["p2alive"] == 1 and status["start"] == 1:
                 # Level 1 (BG)
@@ -683,8 +687,8 @@ def main():
                 if status["counter"] > 400:
                     WIN.blit(BG4, (0, 0))
 
-
-        #-----[ GAME OVER SOLO ]-----
+        #-----[ GAME OVER ]-----
+        # SOLO:
         if status["coop"] == 0:
             if status["p1alive"] == 0 and status["start"] == 1:
                 # empty all the sprites list
@@ -706,6 +710,11 @@ def main():
                 # Draw text on window
                 WIN.blit(text, textRect)
 
+                score = font.render(" SCORE: {}".format(status["points"]),True, RED)
+                scoreRect = score.get_rect()
+                scoreRect.center = (400,250)
+                WIN.blit(score,scoreRect)
+
                 # -----[ QUIT TO MAIN MENU BUTTON ]-----
                 # Blit it on screen, default color, x = 400, y = 200, w = 140, h = 40
                 pygame.draw.rect(WIN, button_color, [330, 300, 140, 40])
@@ -726,8 +735,7 @@ def main():
                 """Must be called after button color changes, as it must appear OVER THEM"""
                 # QUIT TEXT
                 WIN.blit(quit_text, (370, 305))
-
-        #-----[ GAME OVER COOP ]-----
+        # CO-OP:
         if status["coop"] == 1:
             if status["p1alive"] == 0 and status["p2alive"] == 0 and status["start"] == 1:
                 # empty all the sprites list
@@ -741,6 +749,7 @@ def main():
                 pygame.sprite.Group.empty(bug3)
                 pygame.sprite.Group.empty(bug4)
                 pygame.sprite.Group.empty(boss1)
+
                 # Create text and color it (Boolean makes text clearer I think)
                 text = font.render("Game OVER!", True, text_color)
                 # Create coordinates for text
@@ -748,6 +757,12 @@ def main():
                 textRect.center = (400, 200)
                 # Draw text on window
                 WIN.blit(text, textRect)
+
+                score = font.render(" SCORE: {}".format(status["points"]), True, RED)
+                scoreRect = score.get_rect()
+                scoreRect.center = (400, 250)
+                WIN.blit(score, scoreRect)
+
                 # -----[ QUIT TO MAIN MENU BUTTON ]-----
                 # Blit it on screen, default color, x = 400, y = 200, w = 140, h = 40
                 pygame.draw.rect(WIN, button_color, [330, 300, 140, 40])
@@ -770,7 +785,6 @@ def main():
                 # QUIT TEXT
                 WIN.blit(quit_text, (370, 305))
 
-
         # Draws all of the sprites in the ALL SPRITES group
         asp.draw(WIN)
         # Calls the update function from any sprites in the ALL SPRITES group
@@ -785,7 +799,6 @@ def main():
         def spawn():
             # WAVE 1 (20 BT1's)
             if status["counter"] == 3:
-
                 # Incrementer for space between sprites
                 b = 0
                 # Spawn 20 enemies
