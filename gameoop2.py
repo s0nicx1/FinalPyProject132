@@ -781,6 +781,7 @@ def main():
                         status["counter"] = 0
                         status["points"] = 0
                         status["bossdead"] = 0
+
                 # -----[ BUTTON TEXTS ]-----
                 """Must be called after button color changes, as it must appear OVER THEM"""
                 # QUIT TEXT
@@ -1501,6 +1502,75 @@ def main():
                     if b4.health <= 0:
                         b4.kill()
                         status["points"] += 3
+
+        # -----[ BOSS / PLAYER SHIP COLLISION ]------
+        # SOLO:
+        if status["coop"] == 0:
+            for boss in boss1:
+                crash = pygame.sprite.spritecollide(boss, ship, False)
+                for player1 in crash:
+                    player1.health -= 1
+                    print("OUCH!")
+                    boss.health -= 1
+                    pygame.mixer.Sound.play(HIT)
+                    if player1.health <= 0:
+                        player1.kill()
+                        asp.remove(player1)
+                        ship.remove(player1)
+                        status["p1alive"] = 0
+                    if player1.health > 0:
+                        asp.add(player1)
+                        ship.add(player1)
+                        # Put player back at starting coordinates
+                        player1.rect.x = 400
+                        player1.rect.y = 360
+                    if boss.health <= 0:
+                        boss.kill()
+                        status["points"] += 100
+        # CO-OP:
+        if status["coop"] == 1:
+            for boss in boss1:
+                crash1 = pygame.sprite.spritecollide(boss, ship1, False)
+                for player1 in crash1:
+                    player1.health -= 1
+                    print("OUCH!")
+                    boss.health -= 1
+                    pygame.mixer.Sound.play(HIT)
+                    if player1.health <= 0:
+                        player1.kill()
+                        asp.remove(player1)
+                        ship1.remove(player1)
+                        status["p1alive"] = 0
+                    if player1.health > 0:
+                        asp.add(player1)
+                        ship1.add(player1)
+                        # Put player back at starting coordinates
+                        player1.rect.x = 400
+                        player1.rect.y = 360
+                    if boss.health <= 0:
+                        boss.kill()
+                        status["points"] += 100
+            for boss in boss1:
+                crash2 = pygame.sprite.spritecollide(boss, ship2, False)
+                for player2 in crash2:
+                    player2.health -= 1
+                    print("OUCH!")
+                    boss.health -= 1
+                    pygame.mixer.Sound.play(HIT)
+                    if player2.health <= 0:
+                        player2.kill()
+                        asp.remove(player2)
+                        ship2.remove(player2)
+                        status["p2alive"] = 0
+                    if player2.health > 0:
+                        asp.add(player2)
+                        ship2.add(player2)
+                        # Put player back at starting coordinates
+                        player2.rect.x = 400
+                        player2.rect.y = 360
+                    if boss.health <= 0:
+                        boss.kill()
+                        status["points"] += 100
 
         #-----[ PLAYER MOVEMENT ]-----
         # SOLO:
