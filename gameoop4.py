@@ -8,6 +8,7 @@ COLIN: it lacks:
 # Import pygame and random module
 import pygame
 import random
+import RPi.GPIO as GPIO
 
 # Initialize the pygame module
 pygame.init()
@@ -164,6 +165,16 @@ status = {
     "points": 0,
 }
 
+# Connects LEDS to pins
+leds = [13,16,17]
+# Attempt to get buttons connected to pins
+but = [20,27]
+# Set up broadcom
+GPIO.setmode(GPIO.BCM)
+# Attempt to set up buttons
+GPIO.setup(but, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+# Set up LED's
+GPIO.setup(leds,GPIO.OUT)
 
 #=====[ CLASSES ]=====
 #-----[ PLAYER SPRITE CLASS ]-----
@@ -1424,6 +1435,20 @@ def main():
             # If none of the players are alive, set counter == 0 (So game can start again)
             if (status["p1alive"] == 0 and status["p2alive"] == 0 and status["start"] == 1):
                     status["counter"] == 0
+
+            # LEDS
+            if player1.health == 3:
+                GPIO.output(leds, True)
+                # print("LED ON")
+            if player1.health == 2:
+                GPIO.output(13, False)
+                GPIO.output((16, 17), True)
+            if player1.health == 1:
+                GPIO.output((13, 16), False)
+                GPIO.output(17, True)
+            if status["p1alive"] == 0:
+                GPIO.output(leds, False)
+                # print("LED OFF")
 
         # Makes sure player has health at beginning of game
         if status["counter"] == 0:
