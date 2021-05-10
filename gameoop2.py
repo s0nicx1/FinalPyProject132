@@ -29,6 +29,16 @@ BUG1 = pygame.transform.scale(BUG1, (55, 40))
 BUG1A = pygame.image.load("b1a.png")
 BUG1A = pygame.transform.scale(BUG1A, (55, 40))
 
+BUG1B = pygame.image.load("b1b.png")
+BUG1B = pygame.transform.scale(BUG1B, (55, 40))
+
+BUG1C = pygame.image.load("b1c.png")
+BUG1C = pygame.transform.scale(BUG1C, (55, 40))
+
+BUG1D = pygame.image.load("b1c.png")
+BUG1D = pygame.transform.scale(BUG1C, (55, 40))
+BUG1D = pygame.transform.rotate(BUG1C, 180)
+
 # Grabs and adjusts image for second bug type
 BUG2 = pygame.image.load("b2.png")
 BUG2 = pygame.transform.scale(BUG2, (65, 80))
@@ -112,7 +122,7 @@ L_EDGE = -5
 # This constant variable represents the number the Bug Type 1s' coordinates can be modulated by to fire.
 # Basically, it's the bug's fire rate. The lower the number, the faster it fires. This can be adjusted per difficulty
 """COLIN: BUG TYPE 1 WILL NOT FIRE once movement speed is updated if this remains == 110"""
-BUG1_FIRE = 110
+
 
 #=====[ SPRITE GROUPS ]=====
 # Pygame's groupings (lists) of sprites
@@ -162,6 +172,8 @@ status = {
     "coop": 0,
     # Key to track if ending boss' healh == 0
     "bossdead": 0,
+    # Key that defines Bug Type 1's fire rate
+    "bug1fr": 110,
     # Keys that iterate
     "counter": 0,
     "points": 0,
@@ -266,8 +278,14 @@ class BugT1(pygame.sprite.Sprite):
         self.images = []
         # Adds default, pre-defined image to list of images
         self.images.append(BUG1)
-        # Adds secondary, pre-defined image to list of images
+        # Adds second, pre-defined image to list of images
         self.images.append(BUG1A)
+        # Adds a third, pre-defined image to list of images
+        self.images.append(BUG1B)
+        # Adds a fourth, pre-defined image to list of images
+        self.images.append(BUG1C)
+        # Adds a fifth, predefined images to list of images
+        self.images.append(BUG1D)
         # Creates index variable to sort through list
         self.index = 0
         # Picks image for sprite that correlates with index number (0 = BUG1, 1 = BUG1A)
@@ -291,11 +309,10 @@ class BugT1(pygame.sprite.Sprite):
                 self.rect.x += BUG1_MOV1
             if self.rect.x > R_EDGE and self.rect.y == 0:
                 self.rect.x -= BUG1_MOV1
-
-            # Go right
-            if self.rect.x >= L_EDGE and self.rect.y == 0:
+            # Go right once on screen
+            if L_EDGE <= self.rect.x < R_EDGE and self.rect.y == 0:
                 self.rect.x += BUG1_MOV1
-            # Go down (x == edge coordinate and (prev y value =< counter y value < next y value))
+            # Go down (x >= edge coordinate and (prev y value =< counter y value < next y value))
             if self.rect.x == R_EDGE and 0 <= self.rect.y < 40:
                 self.rect.y += BUG1_MOV1
             # Go left
@@ -326,7 +343,11 @@ class BugT1(pygame.sprite.Sprite):
             if self.rect.x > L_EDGE and self.rect.y == 200:
                 self.rect.x -= BUG1_MOV2
                 # Set image to BUG1A as it moves faster
-                self.image = self.images[1]
+                if self.image == self.images[0]:
+                    self.image = self.images[1]
+                # If it's a centipede, keep centipede image
+                if self.image == self.images[2]:
+                    self.image = self.images[2]
             # Go down
             if self.rect.x == L_EDGE and 200 <= self.rect.y < 240:
                 self.rect.y += BUG1_MOV2
@@ -357,7 +378,7 @@ class BugT1(pygame.sprite.Sprite):
 
         # Shoots wherever x coordinate can be cleanly modulated by the number represented
         # by BUG1_FIRE.
-        if (self.rect.x % BUG1_FIRE == 0):
+        if (self.rect.x % status["bug1fr"] == 0):
             # Creates bug laser (blaser)
             blaser = B1Laser()
             # Set laser to appear from the player's image's center
@@ -691,7 +712,7 @@ def main():
                     WIN.blit(BG4, (0, 0))
 
         #-----[ GAME OVER ]-----
-        # SOLO:
+        # SOLO LOSS!:
         if status["coop"] == 0:
             # PLAYER LOSES:
             if status["p1alive"] == 0 and status["start"] == 1:
@@ -738,7 +759,7 @@ def main():
                 """Must be called after button color changes, as it must appear OVER THEM"""
                 # QUIT TEXT
                 WIN.blit(quit_text, (370, 305))
-
+        # SOLO WIN!:
         if status["coop"] == 0:
             # PLAYER WINS!!!
             if status["bossdead"] == 1 and status["start"] == 1:
@@ -786,7 +807,8 @@ def main():
                 """Must be called after button color changes, as it must appear OVER THEM"""
                 # QUIT TEXT
                 WIN.blit(quit_text, (370, 305))
-        # CO-OP:
+
+        # CO-OP LOSS:
         if status["coop"] == 1:
             # PLAYERS LOSE:
             if status["p1alive"] == 0 and status["p2alive"] == 0 and status["start"] == 1:
@@ -837,7 +859,7 @@ def main():
                 """Must be called after button color changes, as it must appear OVER THEM"""
                 # QUIT TEXT
                 WIN.blit(quit_text, (370, 305))
-        # CO-OP:
+        # CO-OP WIN!:
         if status["coop"] == 1:
             # PLAYERS WIN!!!:
             if status["bossdead"] == 1 and status["start"] == 1:
@@ -897,10 +919,11 @@ def main():
 
         #-----[ SPAWNING FUNCTION ]-----
         # Uses pygame's sprite groups to create waves of enemies
+
         # Wave 1: 20 Bug Type 1's (20 TOTAL)
         # This function is called immediately upon game's launch. After, conditionals will run the game
         def spawn():
-            # WAVE 1 (20 BT1's)
+
             if status["counter"] == 3:
                 # Incrementer for space between sprites
                 b = 0
@@ -918,7 +941,9 @@ def main():
                     b += 1
 
 
-            # WAVE 2 (20 BT1's, 10 BT2's)
+
+
+         # WAVE 2 (20 BT1's, 10 BT2's)
             if status["counter"] == 500:
                 # Incrementer for space between sprites
                 b = 20
@@ -929,6 +954,7 @@ def main():
                     # add it to all appropriate lists
                     asp.add(b1)
                     bug1.add(b1)
+
                     # set its initial coordinates to (-80,0)
                     # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug's x
                     b1.rect.x = -80 * b
@@ -982,7 +1008,71 @@ def main():
                     b4.rect.y = 80 * q
                     q += 1
 
-            if status["counter"] == 1400:
+                n = 0
+                # Spawn 20 enemies
+                for i in range(1, 2):
+                    # create a bug 1 type
+                    b1 = BugT1(1)
+                    # add it to all appropriate lists
+                    asp.add(b1)
+                    bug1.add(b1)
+                    b1.image = b1.images[4]
+                    # set its initial coordinates to (-80,0)
+                    # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug's x
+                    b1.rect.x = 800
+                    b1.rect.x += 10 * n
+                    b1.rect.y = 40
+                    n += 1
+
+                # Incrementer for space between sprites
+                b = 1
+                # Spawn 20 enemies
+                for i in range(1, 21):
+                    # create a bug 1 type
+                    b1 = BugT1(1)
+                    # add it to all appropriate lists
+                    asp.add(b1)
+                    bug1.add(b1)
+                    b1.image = b1.images[2]
+                    # set its initial coordinates to (-80,0)
+                    # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug's x
+                    b1.rect.x = 800
+                    b1.rect.x += 10 * b
+                    b1.rect.y = 40
+                    b += 1
+
+                m = 21
+                # Spawn 20 enemies
+                for i in range(1, 2):
+                    # create a bug 1 type
+                    b1 = BugT1(1)
+                    # add it to all appropriate lists
+                    asp.add(b1)
+                    bug1.add(b1)
+                    b1.image = b1.images[3]
+                    # set its initial coordinates to (-80,0)
+                    # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug's x
+                    b1.rect.x = 800
+                    b1.rect.x += 10 * m
+                    b1.rect.y = 40
+                    m += 1
+
+                s = 0
+                # Spawn 20 enemies
+                for i in range(1, 21):
+                    # create a bug 1 type
+                    b1 = BugT1(1)
+                    # add it to all appropriate lists
+                    asp.add(b1)
+                    bug1.add(b1)
+                    b1.image = b1.images[2]
+                    # set its initial coordinates to (-80,0)
+                    # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug's x
+                    b1.rect.x = -10 * s
+                    b1.rect.y = 0
+                    s += 1
+
+            if status["counter"] == 1800:
                 boss = Boss(40)
                 asp.add(boss)
                 boss1.add(boss)
@@ -1587,7 +1677,6 @@ def main():
         #-----[ TIMER/ITERATOR/INCREMENTER/COUNTER ]-----
         # A constantly iterating variable in place of a time module
         # spawns enemies and controls level progression
-
         # SOLO
         if status["coop"] == 0:
             # If player is alive, increment the counter
@@ -1596,7 +1685,6 @@ def main():
             # Otherwise, set the counter == 0 (So game can start again)
             else:
                 status["counter"] == 0
-
         # COOP
         if status["coop"] == 1:
             # If both players are alive, increment the counter
@@ -1610,6 +1698,7 @@ def main():
             # If none of the players are alive, set counter == 0 (So game can start again)
             if (status["p1alive"] == 0 and status["p2alive"] == 0 and status["start"] == 1):
                     status["counter"] == 0
+
 
         # Makes sure player has health at beginning of game
         if status["counter"] == 0:
