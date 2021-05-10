@@ -167,11 +167,13 @@ status = {
 
 # Connects LEDS to pins
 leds = [13,16,17]
+leds2 = [4,5,6]
 
 # Set up broadcom
 GPIO.setmode(GPIO.BCM)
 # Set up LED's
 GPIO.setup(leds,GPIO.OUT)
+GPIO.setup(leds2, GPIO.OUT)
 
 #=====[ CLASSES ]=====
 #-----[ PLAYER SPRITE CLASS ]-----
@@ -1434,17 +1436,31 @@ def main():
                     status["counter"] == 0
 
         # LEDS
-        if player1.health == 3:
+        if player2.health == 3:
             GPIO.output(leds, True)
             # print("LED ON")
-        if player1.health == 2:
+        if player2.health == 2:
             GPIO.output(13, False)
             GPIO.output((16, 17), True)
-        if player1.health == 1:
+        if player2.health == 1:
             GPIO.output((13, 16), False)
             GPIO.output(17, True)
-        if status["p1alive"] == 0:
+        if status["p2alive"] == 0:
             GPIO.output(leds, False)
+            # print("LED OFF")
+            
+        # LEDS2
+        if player1.health == 3:
+            GPIO.output(leds2, True)
+            # print("LED ON")
+        if player1.health == 2:
+            GPIO.output(4, False)
+            GPIO.output((5, 6), True)
+        if player1.health == 1:
+            GPIO.output((4, 5), False)
+            GPIO.output(6, True)
+        if status["p1alive"] == 0:
+            GPIO.output(leds2, False)
             # print("LED OFF")
 
         # Makes sure player has health at beginning of game
