@@ -1,9 +1,5 @@
-"""
-COLIN: it lacks:
-- An actual game
-- Music exclusive to main menu or defeat?
-- A box to put it all in
-"""
+""" THIS VERSION IS FOR DEVELOPMENT PURPOSES"""
+""" THE FINAL, RPi-COMPATIBLE VERSION IS gameoopRPi.py"""
 
 # Import pygame and random module
 import pygame
@@ -47,21 +43,38 @@ BUG2 = pygame.transform.scale(BUG2, (65, 80))
 BUG2A = pygame.image.load("b2a.png")
 BUG2A = pygame.transform.scale(BUG2A, (65, 80))
 
+BUG2L = pygame.image.load("b2.png")
+BUG2L = pygame.transform.scale(BUG2, (65, 80))
+BUG2L = pygame.transform.rotate(BUG2, 90)
+
+BUG2R = pygame.image.load("b2.png")
+BUG2R = pygame.transform.scale(BUG2, (65, 80))
+BUG2R = pygame.transform.rotate(BUG2, 270)
+
 # Grabs and adjusts image for third bug type
 BUG3 = pygame.image.load("b3.png")
 BUG3 = pygame.transform.scale(BUG3, (55, 40))
 
 # Grabs and adjusts image for fourth bug type
 BUG4 = pygame.image.load("b4.png")
-BUG4 = pygame.transform.scale(BUG4, (55,40))
+BUG4 = pygame.transform.scale(BUG4, (55, 40))
 
 # Grabs and adjusts image for the boss
-BOSS = pygame.image.load("b5.png")
+BOSS = pygame.image.load("boss.png")
 BOSS = pygame.transform.scale(BOSS, (300, 150))
+
+BOSS_D1 = pygame.image.load("boss_damage1.png")
+BOSS_D1 = pygame.transform.scale(BOSS_D1, (300, 150))
+
+BOSS_D2 = pygame.image.load("boss_damage2.png")
+BOSS_D2 = pygame.transform.scale(BOSS_D2, (300, 150))
+
+BOSS_D3 = pygame.image.load("boss_damage3.png")
+BOSS_D3 = pygame.transform.scale(BOSS_D3, (300, 150))
 
 # Grab image for background
 BG = pygame.image.load("space.jpg")
-#BG2 = pygame.image.load("space2.png")
+# This is a good background. use it
 BG3 = pygame.image.load("space3.png")
 BG4 = pygame.image.load("space4.png")
 
@@ -74,8 +87,6 @@ HIT = pygame.mixer.Sound("Explosion.wav")
 BUZZ = pygame.mixer.Sound("buzz.wav")
 
 #=====[ VARIABLES AND LISTS ]=====
-# Constant variable representing a movement speed of 5 pixels for the player sprite(s)
-PIX = 5
 # The following constant variables represent RGB values for colors
 RED = (255, 0, 0)
 CYAN = (0, 255, 255)
@@ -170,7 +181,7 @@ status = {
     "start": 0,
     # Key to show if co-op was selected
     "coop": 0,
-    # Key to track if ending boss' healh == 0
+    # Key to track if ending boss' health == 0
     "bossdead": 0,
     # Key that defines Bug Type 1's fire rate
     "bug1fr": 110,
@@ -198,14 +209,14 @@ class Player1(pygame.sprite.Sprite):
     # Function that moves the player  when called
     def move(self):
         keys_pressed = pygame.key.get_pressed()
-        if keys_pressed[pygame.K_a] and self.rect.x - PIX > 0:
-            self.rect.x -= PIX
-        if keys_pressed[pygame.K_d] and self.rect.x + PIX + 55 < 799:
-            self.rect.x += PIX
+        if keys_pressed[pygame.K_a] and self.rect.x - 5 > 0:
+            self.rect.x -= 5
+        if keys_pressed[pygame.K_d] and self.rect.x + 5 + 55 < 799:
+            self.rect.x += 5
         if keys_pressed[pygame.K_w] and self.rect.y > 0:
-            self.rect.y -= PIX
+            self.rect.y -= 5
         if keys_pressed[pygame.K_s] and self.rect.y < 360:
-            self.rect.y += PIX
+            self.rect.y += 5
 
 #-----[ PLAYER 2 SPRITE CLASS ]-----
 class Player2(pygame.sprite.Sprite):
@@ -224,14 +235,14 @@ class Player2(pygame.sprite.Sprite):
     # Function that moves the player  when called
     def move(self):
         keys_pressed = pygame.key.get_pressed()
-        if keys_pressed[pygame.K_LEFT] and self.rect.x - PIX > 0:
-            self.rect.x -= PIX
-        if keys_pressed[pygame.K_RIGHT] and self.rect.x + PIX + 55 < 799:
-            self.rect.x += PIX
+        if keys_pressed[pygame.K_LEFT] and self.rect.x - 5 > 0:
+            self.rect.x -= 5
+        if keys_pressed[pygame.K_RIGHT] and self.rect.x + 5 + 55 < 799:
+            self.rect.x += 5
         if keys_pressed[pygame.K_UP] and self.rect.y > 0:
-            self.rect.y -= PIX
+            self.rect.y -= 5
         if keys_pressed[pygame.K_DOWN] and self.rect.y < 360:
-            self.rect.y += PIX
+            self.rect.y += 5
 
 #-----[ PLAYER 1 LASER SPIRTE CLASS ]-----
 class Laser (pygame.sprite.Sprite):
@@ -419,8 +430,14 @@ class BugT2(pygame.sprite.Sprite):
         self.health = health
         # Grabs the predefined variable from up top that represents the bug's image
         self.images = []
+        # Default image at index 0
         self.images.append(BUG2)
+        # Secondary (Damaged) image at index 1
         self.images.append(BUG2A)
+        # Left variation at index 2
+        self.images.append(BUG2L)
+        # Right variation at index 3
+        self.images.append(BUG2R)
         self.index = 0
         self.image = self.images[self.index]
         # Creates rectangle for the sprite and tracks coordinates
@@ -432,30 +449,34 @@ class BugT2(pygame.sprite.Sprite):
 
     # Update the sprite's movement
     def update(self):
+        # If health decreases, choose secondary image
         if self.health == 1:
             self.image = self.images[1]
+
+        # If BT2 is between the edges of the screen:
         # Go down the screen until y coordinate == 200
-        if self.rect.y != 200 and len(b2lasers) != 10:
-            self.rect.y += 1
-       # If it reaches y coordiante 50, 100, or 200:
-        if self.rect.y == 50 or self.rect.y == 100 or self.rect.y == 200:
-            # Make a laser
-            blaser = B2Laser()
-            # Set laser to appear from center of sprite image
-            blaser.rect.x = self.rect.x + 28
-            blaser.rect.y = self.rect.y + 60
-            # Add laser to the ALL SPRITES group as it's made
-            asp.add(blaser)
-            # Add laser to the Bug Lasers group as it's made
-            blasers.add(blaser)
-            # add 1 to the list of how many lasers Bug Type 2 can fire
-            b2lasers.append("1")
-        # If y coordinate == 200 and the length of the list of fired lasers > 80:
-        if self.rect.y == 200 and len(b2lasers) > 80:
-            # Stop firing, and continue down the screen
-            self.rect.y += 1
-        if self.rect.y > 400:
-            self.kill()
+        if L_EDGE < self.rect.x < R_EDGE:
+            if self.rect.y != 200 and len(b2lasers) != 10:
+                self.rect.y += 1
+           # If it reaches y coordiante 50, 100, or 200:
+            if self.rect.y == 50 or self.rect.y == 100 or self.rect.y == 200:
+                # Make a laser
+                blaser = B2Laser()
+                # Set laser to appear from center of sprite image
+                blaser.rect.x = self.rect.x + 28
+                blaser.rect.y = self.rect.y + 60
+                # Add laser to the ALL SPRITES group as it's made
+                asp.add(blaser)
+                # Add laser to the Bug Lasers group as it's made
+                blasers.add(blaser)
+                # add 1 to the list of how many lasers Bug Type 2 can fire
+                b2lasers.append("1")
+            # If y coordinate == 200 and the length of the list of fired lasers > 80:
+            if self.rect.y == 200 and len(b2lasers) > 80:
+                # Stop firing, and continue down the screen
+                self.rect.y += 1
+            if self.rect.y > 400:
+                self.kill()
 
 #-----[ BUG TYPE 2 LASER SPRITE CLASS ]-----
 class B2Laser(pygame.sprite.Sprite):
@@ -531,7 +552,17 @@ class Boss(pygame.sprite.Sprite):
         # Calls pygame's sprite class
         super().__init__()
         # Grabs the predefined variable from up top that represents the bug's image
-        self.image = BOSS
+        self.images = []
+        # Default image at index 0
+        self.images.append(BOSS)
+        # Second image at index 1
+        self.images.append(BOSS_D1)
+        # Third image at index 2
+        self.images.append(BOSS_D2)
+        # Fourth image at index 3
+        self.images.append(BOSS_D3)
+        self.index = 0
+        self.image = self.images[self.index]
         # Creates rectangle for the sprite and tracks coordinates
         self.rect = self.image.get_rect()
         self.health = health
@@ -542,34 +573,48 @@ class Boss(pygame.sprite.Sprite):
 
     # Update the sprite's movement
     def update(self):
-
+        if 30 < self.health <= 40:
+            self.image = self.images[0]
+        if 20 < self.health <= 30:
+            self.image = self.images[1]
+        if 10 < self.health <= 20:
+            self.image = self.images[2]
+        if 0 < self.health <= 10:
+            self.image = self.images[3]
         # Go down the screen until y coordinate == 50
         if self.rect.y != 50:
             self.rect.y += 1
         if self.rect.y == 50:
-            blaser = BOSSLaser()
-            blaser.rect.x = 265
-            blaser.rect.y = 180
-            asp.add(blaser)
-            blasers.add(blaser)
+            if self.health > 20:
+                blaser = BOSSLaser()
+                blaser.rect.x = 265
+                blaser.rect.y = 180
+                asp.add(blaser)
+                blasers.add(blaser)
 
-            blaser = BOSSLaser()
-            blaser.rect.x = 525
-            blaser.rect.y = 180
-            asp.add(blaser)
-            blasers.add(blaser)
+                blaser = BOSSLaser()
+                blaser.rect.x = 345
+                blaser.rect.y = 180
+                asp.add(blaser)
+                blasers.add(blaser)
 
-            blaser = BOSSLaser()
-            blaser.rect.x = 345
-            blaser.rect.y = 180
-            asp.add(blaser)
-            blasers.add(blaser)
+            if self.health > 10:
+                blaser = BOSSLaser()
+                blaser.rect.x = 525
+                blaser.rect.y = 180
+                asp.add(blaser)
+                blasers.add(blaser)
 
-            blaser = BOSSLaser()
-            blaser.rect.x = 450
-            blaser.rect.y = 180
-            asp.add(blaser)
-            blasers.add(blaser)
+
+
+                blaser = BOSSLaser()
+                blaser.rect.x = 450
+                blaser.rect.y = 180
+                asp.add(blaser)
+                blasers.add(blaser)
+
+            else:
+                pass
 
 #-----[ BOSS LASER SPRITE CLASS ]-----
 class BOSSLaser(pygame.sprite.Sprite):
@@ -593,6 +638,7 @@ class BOSSLaser(pygame.sprite.Sprite):
 #=====[ MAIN GAME LOOP ]=====
 # COLIN: Here is where the game is run. It sets up the foundation of the pygame, then refers to several
 # classes and functions to display the pygame.
+
 #-----[ MAIN LOOP ]-----
 def main():
     # creates a player sprites (but doesn't display them just yet)
@@ -910,6 +956,7 @@ def main():
                 """Must be called after button color changes, as it must appear OVER THEM"""
                 # QUIT TEXT
                 WIN.blit(quit_text, (370, 305))
+
         # Draws all of the sprites in the ALL SPRITES group
         asp.draw(WIN)
         # Calls the update function from any sprites in the ALL SPRITES group
@@ -923,7 +970,6 @@ def main():
         # Wave 1: 20 Bug Type 1's (20 TOTAL)
         # This function is called immediately upon game's launch. After, conditionals will run the game
         def spawn():
-
             if status["counter"] == 3:
                 # Incrementer for space between sprites
                 b = 0
@@ -939,9 +985,6 @@ def main():
                     b1.rect.x = -80 * b
                     b1.rect.y = 0
                     b += 1
-
-
-
 
          # WAVE 2 (20 BT1's, 10 BT2's)
             if status["counter"] == 500:
@@ -974,6 +1017,55 @@ def main():
                     b2.rect.x = 100 * s
                     b2.rect.y = -100
                     s += 1
+
+            if status["counter"] == 800:
+                f = 1
+                for i in range(1, 3):
+                    # Create a bug type 2
+                    b2 = BugT2(2)
+                    # add it to all appropriate sprite lists
+                    asp.add(b2)
+                    bug2.add(b2)
+                    # Everytime a bug gets spawned, s is incremented by 1, so 100 pixels of space is made between each bug's x
+                    b2.rect.x = 400
+                    b2.rect.y = -100 * f
+                    f += 1
+
+                f = 1
+                for i in range(1, 3):
+                    # Create a bug type 2
+                    b2 = BugT2(2)
+                    # add it to all appropriate sprite lists
+                    asp.add(b2)
+                    bug2.add(b2)
+                    # Everytime a bug gets spawned, s is incremented by 1, so 100 pixels of space is made between each bug's x
+                    b2.rect.x = 465
+                    b2.rect.y = -100 * f
+                    f += 1
+
+                f = 1
+                for i in range(1, 3):
+                    # Create a bug type 2
+                    b2 = BugT2(2)
+                    # add it to all appropriate sprite lists
+                    asp.add(b2)
+                    bug2.add(b2)
+                    # Everytime a bug gets spawned, s is incremented by 1, so 100 pixels of space is made between each bug's x
+                    b2.rect.x = 335
+                    b2.rect.y = -100 * f
+                    f += 1
+
+                f = 1
+                for i in range(1, 3):
+                    # Create a bug type 2
+                    b2 = BugT2(2)
+                    # add it to all appropriate sprite lists
+                    asp.add(b2)
+                    bug2.add(b2)
+                    # Everytime a bug gets spawned, s is incremented by 1, so 100 pixels of space is made between each bug's x
+                    b2.rect.x = 270
+                    b2.rect.y = -100 * f
+                    f += 1
 
             if status["counter"] == 1200:
                 # Bug Type 3's
