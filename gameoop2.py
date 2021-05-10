@@ -17,66 +17,75 @@ PLAYER1 = pygame.transform.scale(PLAYER1, (55, 40))
 PLAYER2 = pygame.image.load("p2.png")
 PLAYER2 = pygame.transform.scale(PLAYER2, (55, 40))
 
-# Grabs and adjusts image for the first bug type
+# Grabs and adjusts image for the Bug Type 1
 BUG1 = pygame.image.load("b1.png")
 BUG1 = pygame.transform.scale(BUG1, (55, 40))
 
-# Grabs and adjusts secondary image for first bug type
+# Grabs and adjusts secondary image for Bug Type 1
 BUG1A = pygame.image.load("b1a.png")
 BUG1A = pygame.transform.scale(BUG1A, (55, 40))
 
+# Grabs and adjusts image for centipede variation of Bug Type 1
 BUG1B = pygame.image.load("b1b.png")
 BUG1B = pygame.transform.scale(BUG1B, (55, 40))
 
+# Grabs and adjusts image for centipede variation of Bug Type 1
 BUG1C = pygame.image.load("b1c.png")
 BUG1C = pygame.transform.scale(BUG1C, (55, 40))
 
+# Grabs and adjusts image for centipede variation of Bug Type 1
 BUG1D = pygame.image.load("b1c.png")
 BUG1D = pygame.transform.scale(BUG1C, (55, 40))
 BUG1D = pygame.transform.rotate(BUG1C, 180)
 
-# Grabs and adjusts image for second bug type
+# Grabs and adjusts image for Bug Type 2
 BUG2 = pygame.image.load("b2.png")
 BUG2 = pygame.transform.scale(BUG2, (65, 80))
 
-# Grabs and adjusts secondary image for second bug type
+# Grabs and adjusts secondary image for Bug Type 2
 BUG2A = pygame.image.load("b2a.png")
 BUG2A = pygame.transform.scale(BUG2A, (65, 80))
 
+# Grabs and adjusts image for left variation of Bug Type 2
 BUG2L = pygame.image.load("b2.png")
 BUG2L = pygame.transform.scale(BUG2, (65, 80))
 BUG2L = pygame.transform.rotate(BUG2, 90)
 
+# Grabs and adjusts image for right variation of Bug Type 2
 BUG2R = pygame.image.load("b2.png")
 BUG2R = pygame.transform.scale(BUG2, (65, 80))
 BUG2R = pygame.transform.rotate(BUG2, 270)
 
-# Grabs and adjusts image for third bug type
+# Grabs and adjusts image for Bug Type 3
 BUG3 = pygame.image.load("b3.png")
 BUG3 = pygame.transform.scale(BUG3, (55, 40))
 
-# Grabs and adjusts image for fourth bug type
+# Grabs and adjusts image for Bug Type 4
 BUG4 = pygame.image.load("b4.png")
 BUG4 = pygame.transform.scale(BUG4, (55, 40))
 
-# Grabs and adjusts image for the boss
+# Grabs and adjusts image for the Boss
 BOSS = pygame.image.load("boss.png")
 BOSS = pygame.transform.scale(BOSS, (300, 150))
 
+# Grabs and adjusts  image for the damaged Boss
 BOSS_D1 = pygame.image.load("boss_damage1.png")
 BOSS_D1 = pygame.transform.scale(BOSS_D1, (300, 150))
 
+# Grabs and adjusts  image for the damaged Boss
 BOSS_D2 = pygame.image.load("boss_damage2.png")
 BOSS_D2 = pygame.transform.scale(BOSS_D2, (300, 150))
 
+# Grabs and adjusts  image for the damaged Boss
 BOSS_D3 = pygame.image.load("boss_damage3.png")
 BOSS_D3 = pygame.transform.scale(BOSS_D3, (300, 150))
 
-# Grab image for background
+# Grab image for first background
 BG = pygame.image.load("space.jpg")
 # This is a good background. use it
-BG3 = pygame.image.load("space3.png")
-BG4 = pygame.image.load("space4.png")
+BG2 = pygame.image.load("space4.png")
+BG3 = pygame.image.load("N2D Space.png")
+#BG3 = pygame.image.load("space4.png")
 
 # Grab music for game audio
 MUSIC = pygame.mixer.music.load("game_music.mp3")
@@ -745,8 +754,10 @@ def main():
                 if status["counter"] < 400:
                     WIN.blit(BG, (0, 0))
                 # Level 2 (BG2)
-                if status["counter"] > 400:
-                    WIN.blit(BG4, (0, 0))
+                if 400 < status["counter"] < 1400:
+                    WIN.blit(BG2, (0, 0))
+                if status["counter"] > 1400:
+                    WIN.blit(BG3, (0,0))
         # CO-OP:
         if status["coop"] == 1:
             if status["p1alive"] == 1 or status["p2alive"] == 1 and status["start"] == 1:
@@ -754,8 +765,10 @@ def main():
                 if status["counter"] < 400:
                     WIN.blit(BG, (0, 0))
                 # Level 2 (BG2)
-                if status["counter"] > 400:
-                    WIN.blit(BG4, (0, 0))
+                if 400 < status["counter"] < 1400:
+                    WIN.blit(BG2, (0, 0))
+                if status["counter"] > 1400:
+                    WIN.blit(BG3, (0, 0))
 
         #-----[ GAME OVER ]-----
         # SOLO LOSS!:
@@ -1421,6 +1434,7 @@ def main():
                     asp.remove(b1)
                     bug1.remove(b1)
                     player1.health -= 1
+                    print("HEALTH: {}".format(player1.health))
                     print("OUCH!")
                     pygame.mixer.Sound.play(HIT)
                     if player1.health <= 0:
@@ -1443,6 +1457,7 @@ def main():
                     asp.remove(b1)
                     bug1.remove(b1)
                     player2.health -= 1
+                    print("HEALTH: {}".format(player2.health))
                     print("OUCH!")
                     pygame.mixer.Sound.play(HIT)
                     if player2.health <= 0:
@@ -1452,7 +1467,7 @@ def main():
                         status["p2alive"] = 0
                     if player2.health > 0:
                         asp.add(player2)
-                        ship1.add(player2)
+                        ship2.add(player2)
                         # Put player back at starting coordinates
                         player2.rect.x = 400
                         player2.rect.y = 360
@@ -1465,6 +1480,7 @@ def main():
                     bug1.remove(b1)
                     player1.health -= 1
                     print("OUCH!")
+                    print("HEALTH: {}".format(player1.health))
                     pygame.mixer.Sound.play(HIT)
                     if player1.health <= 0:
                         player1.kill()
@@ -1486,6 +1502,7 @@ def main():
                 for player1 in crash:
                     player1.health -= 1
                     print("OUCH!")
+                    print("HEALTH: {}".format(player1.health))
                     b2.health -= 1
                     print(b2.health)
                     pygame.mixer.Sound.play(HIT)
@@ -1511,6 +1528,7 @@ def main():
                 for player2 in crash2:
                     player2.health -= 1
                     print("OUCH!")
+                    print("HEALTH: {}".format(player2.health))
                     b2.health -= 1
                     pygame.mixer.Sound.play(HIT)
                     if player2.health <= 0:
@@ -1520,7 +1538,7 @@ def main():
                         status["p2alive"] = 0
                     if player2.health > 0:
                         asp.add(player2)
-                        ship1.add(player2)
+                        ship2.add(player2)
                         # Put player back at starting coordinates
                         player2.rect.x = 400
                         player2.rect.y = 360
@@ -1534,6 +1552,7 @@ def main():
                 for player1 in crash:
                     player1.health -= 1
                     print("OUCH!")
+                    print("HEALTH: {}".format(player1.health))
                     b2.health -= 1
                     pygame.mixer.Sound.play(HIT)
                     if player1.health <= 0:
@@ -1559,6 +1578,7 @@ def main():
                 for player1 in crash:
                     player1.health -= 1
                     print("OUCH!")
+                    print("HEALTH: {}".format(player1.health))
                     asp.remove(b3)
                     bug3.remove(b3)
                     pygame.mixer.Sound.play(HIT)
@@ -1580,6 +1600,7 @@ def main():
                 for player1 in crash:
                     player1.health -= 1
                     print("OUCH!")
+                    print("HEALTH: {}".format(player1.health))
                     b3.health -= 1
                     pygame.mixer.Sound.play(HIT)
                     if player1.health <= 0:
@@ -1601,6 +1622,7 @@ def main():
                 for player2 in crash2:
                     player2.health -= 1
                     print("OUCH!")
+                    print("HEALTH: {}".format(player2.health))
                     b3.health -= 1
                     pygame.mixer.Sound.play(HIT)
                     if player2.health <= 0:
@@ -1610,7 +1632,7 @@ def main():
                         status["p2alive"] = 0
                     if player2.health > 0:
                         asp.add(player2)
-                        ship.add(player2)
+                        ship2.add(player2)
                         # Put player back at starting coordinates
                         player2.rect.x = 400
                         player2.rect.y = 320
@@ -1623,6 +1645,7 @@ def main():
                 for player1 in crash:
                     player1.health -= 1
                     print("OUCH!")
+                    print("HEALTH: {}".format(player1.health))
                     asp.remove(b4)
                     b4.health -= 1
                     pygame.mixer.Sound.play(HIT)
@@ -1647,6 +1670,7 @@ def main():
                 for player1 in crash:
                     player1.health -= 1
                     print("OUCH!")
+                    print("HEALTH: {}".format(player1.health))
                     b4.health -= 1
                     pygame.mixer.Sound.play(HIT)
                     if player1.health <= 0:
@@ -1668,6 +1692,7 @@ def main():
                 for player2 in crash2:
                     player2.health -= 1
                     print("OUCH!")
+                    print("HEALTH: {}".format(player2.health))
                     b4.health -= 1
                     pygame.mixer.Sound.play(HIT)
                     if player2.health <= 0:
@@ -1693,6 +1718,7 @@ def main():
                 for player1 in crash:
                     player1.health -= 1
                     print("OUCH!")
+                    print("HEALTH: {}".format(player1.health))
                     boss.health -= 1
                     pygame.mixer.Sound.play(HIT)
                     if player1.health <= 0:
@@ -1716,6 +1742,7 @@ def main():
                 for player1 in crash1:
                     player1.health -= 1
                     print("OUCH!")
+                    print("HEALTH: {}".format(player1.health))
                     boss.health -= 1
                     pygame.mixer.Sound.play(HIT)
                     if player1.health <= 0:
@@ -1737,6 +1764,7 @@ def main():
                 for player2 in crash2:
                     player2.health -= 1
                     print("OUCH!")
+                    print("HEALTH: {}".format(player2.health))
                     boss.health -= 1
                     pygame.mixer.Sound.play(HIT)
                     if player2.health <= 0:
