@@ -4,11 +4,13 @@
 # Import pygame and random module
 import pygame
 import random
+import RPi.GPIO as GPIO
+
 
 # Initialize the pygame module
 pygame.init()
 
-#=====[ IMAGES & AUDIO ]=====
+# =====[ IMAGES & AUDIO ]=====
 # Grabs and adjusts the image to fit onto the screen with desired (width, height)
 PLAYER1 = pygame.image.load("p1.png")
 PLAYER1 = pygame.transform.scale(PLAYER1, (55, 40))
@@ -85,7 +87,7 @@ BG = pygame.image.load("space.jpg")
 # This is a good background. use it
 BG2 = pygame.image.load("space4.png")
 BG3 = pygame.image.load("N2D Space.png")
-#BG3 = pygame.image.load("space4.png")
+# BG3 = pygame.image.load("space4.png")
 
 # Grab music for game audio
 MUSIC = pygame.mixer.music.load("game_music.mp3")
@@ -95,15 +97,15 @@ FIRE = pygame.mixer.Sound("laserfire.wav")
 HIT = pygame.mixer.Sound("Explosion.wav")
 BUZZ = pygame.mixer.Sound("buzz.wav")
 
-#=====[ VARIABLES AND LISTS ]=====
+# =====[ VARIABLES AND LISTS ]=====
 # The following constant variables represent RGB values for colors
 RED = (255, 0, 0)
 CYAN = (0, 255, 255)
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0)
-YELLOW = (255,255,0)
+YELLOW = (255, 255, 0)
 
-#-----[ ON SCREEN BUTTONS ]-----
+# -----[ ON SCREEN BUTTONS ]-----
 # Constant variable for button (rectangle) height
 BUTTON_H = 40
 # Constant variable for button (rectangle) width
@@ -143,8 +145,7 @@ L_EDGE = -5
 # Basically, it's the bug's fire rate. The lower the number, the faster it fires. This can be adjusted per difficulty
 """COLIN: BUG TYPE 1 WILL NOT FIRE once movement speed is updated if this remains == 110"""
 
-
-#=====[ SPRITE GROUPS ]=====
+# =====[ SPRITE GROUPS ]=====
 # Pygame's groupings (lists) of sprites
 # This creates a pygame group for (A)LL (SP)RITES
 asp = pygame.sprite.Group()
@@ -169,7 +170,7 @@ bug4 = pygame.sprite.Group()
 # This creates a pygame group for the boss bug type
 boss1 = pygame.sprite.Group()
 
-#=====[ CREATE WINDOW ]======
+# =====[ CREATE WINDOW ]======
 # Constant variable for window's width (800) and height (400); RPi screen size
 SIZE = 800, 400
 # Constant variable for pygame creating the window
@@ -177,8 +178,8 @@ WIN = pygame.display.set_mode(SIZE)
 # Sets caption for upper left corner of window
 pygame.display.set_caption("Tech Universe: Re")
 # Constant variables for window's width and height for buttons
-WIDTH = WIN.get_width() # 800
-HEIGHT = WIN.get_height() # 400
+WIDTH = WIN.get_width()  # 800
+HEIGHT = WIN.get_height()  # 400
 
 # Dictionary that keeps and updates game variables
 status = {
@@ -199,9 +200,18 @@ status = {
     "points": 0,
 }
 
+# Connects LEDS to pins
+leds = [13,16,17]
+leds2 = [4,5,6]
 
-#=====[ CLASSES ]=====
-#-----[ PLAYER SPRITE CLASS ]-----
+# Set up broadcom
+GPIO.setmode(GPIO.BCM)
+# Set up LED's
+GPIO.setup(leds,GPIO.OUT)
+GPIO.setup(leds2, GPIO.OUT)
+
+# =====[ CLASSES ]=====
+# -----[ PLAYER SPRITE CLASS ]-----
 class Player1(pygame.sprite.Sprite):
     # Constructor for Player Sprite
     def __init__(self, health):
@@ -227,7 +237,8 @@ class Player1(pygame.sprite.Sprite):
         if keys_pressed[pygame.K_s] and self.rect.y < 360:
             self.rect.y += 5
 
-#-----[ PLAYER 2 SPRITE CLASS ]-----
+
+# -----[ PLAYER 2 SPRITE CLASS ]-----
 class Player2(pygame.sprite.Sprite):
     # Constructor for Player Sprite
     def __init__(self, health):
@@ -253,8 +264,9 @@ class Player2(pygame.sprite.Sprite):
         if keys_pressed[pygame.K_DOWN] and self.rect.y < 360:
             self.rect.y += 5
 
-#-----[ PLAYER 1 LASER SPIRTE CLASS ]-----
-class Laser (pygame.sprite.Sprite):
+
+# -----[ PLAYER 1 LASER SPIRTE CLASS ]-----
+class Laser(pygame.sprite.Sprite):
     def __init__(self):
         # Calls pygame's sprite class
         super().__init__()
@@ -271,8 +283,9 @@ class Laser (pygame.sprite.Sprite):
         if self.rect.y <= 0:
             self.kill()
 
-#-----[ PLAYER 2 LASER SPIRTE CLASS ]-----
-class Laser2 (pygame.sprite.Sprite):
+
+# -----[ PLAYER 2 LASER SPIRTE CLASS ]-----
+class Laser2(pygame.sprite.Sprite):
     def __init__(self):
         # Calls pygame's sprite class
         super().__init__()
@@ -289,7 +302,8 @@ class Laser2 (pygame.sprite.Sprite):
         if self.rect.y <= 0:
             self.kill()
 
-#------[ BUG TYPE 1 SPRITE CLASS ]------
+
+# ------[ BUG TYPE 1 SPRITE CLASS ]------
 class BugT1(pygame.sprite.Sprite):
     def __init__(self, health):
         # Calls pygame's sprite class
@@ -315,7 +329,6 @@ class BugT1(pygame.sprite.Sprite):
         # Instance variable that acts as a boolean for the for loop below
         self.move = 1
         self.health = health
-
 
     # Function that draws the Bug Type 1 onto the screen at given coordinates
     def draw(self, window):
@@ -412,13 +425,14 @@ class BugT1(pygame.sprite.Sprite):
     """COLIN: I think it'd be cool if we had a level where the bug type 1 just closed in the player at different y intervals
     while showering down laserfire. You'd have to make it shoot in an infinite loop though"""
 
-#-----[ BUG TYPE 1 LASER SPRITE CLASS ]-----
+
+# -----[ BUG TYPE 1 LASER SPRITE CLASS ]-----
 class B1Laser(pygame.sprite.Sprite):
     def __init__(self):
         # Calls pygame's sprite class
         super().__init__()
         # Creates a rectangle with width and height of 4 and fills it with predefined color RED
-        self.image = pygame.Surface([4,10])
+        self.image = pygame.Surface([4, 10])
         self.image.fill(GREEN)
         # Creates a rectangle (hitbox) for the sprite and tracks its coordinates
         self.rect = self.image.get_rect()
@@ -431,7 +445,8 @@ class B1Laser(pygame.sprite.Sprite):
         if self.rect.y > 400:
             self.kill()
 
-#-----[ BUG TYPE 2 SPRITE CLASS]-----
+
+# -----[ BUG TYPE 2 SPRITE CLASS]-----
 class BugT2(pygame.sprite.Sprite):
     def __init__(self, health):
         # Calls pygame's sprite class
@@ -467,7 +482,7 @@ class BugT2(pygame.sprite.Sprite):
         if L_EDGE < self.rect.x < R_EDGE:
             if self.rect.y != 200 and len(b2lasers) != 10:
                 self.rect.y += 1
-           # If it reaches y coordiante 50, 100, or 200:
+            # If it reaches y coordiante 50, 100, or 200:
             if self.rect.y == 50 or self.rect.y == 100 or self.rect.y == 200:
                 # Make a laser
                 blaser = B2Laser()
@@ -487,13 +502,14 @@ class BugT2(pygame.sprite.Sprite):
             if self.rect.y > 400:
                 self.kill()
 
-#-----[ BUG TYPE 2 LASER SPRITE CLASS ]-----
+
+# -----[ BUG TYPE 2 LASER SPRITE CLASS ]-----
 class B2Laser(pygame.sprite.Sprite):
     def __init__(self):
         # Calls pygame's sprite class
         super().__init__()
         # Creates a rectangle with width and height of 4 and fills it with predefined color RED
-        self.image = pygame.Surface([10,80])
+        self.image = pygame.Surface([10, 80])
         self.image.fill(GREEN)
         # Creates a rectangle (hitbox) for the sprite and tracks its coordinates
         self.rect = self.image.get_rect()
@@ -506,9 +522,10 @@ class B2Laser(pygame.sprite.Sprite):
         if self.rect.y > 400:
             self.kill()
 
-#-----[ BUG TYPE 3 SPRITE CLASS]-----
+
+# -----[ BUG TYPE 3 SPRITE CLASS]-----
 class BugT3(pygame.sprite.Sprite):
-    def __init__(self,health):
+    def __init__(self, health):
         # Calls pygame's sprite class
         super().__init__()
         # Grabs the predefined variable from up top that represents the bug's image
@@ -533,7 +550,8 @@ class BugT3(pygame.sprite.Sprite):
         if self.rect.x == 400:
             self.kill()
 
-#-----[ BUG TYPE 4 SPRITE CLASS]-----
+
+# -----[ BUG TYPE 4 SPRITE CLASS]-----
 class BugT4(pygame.sprite.Sprite):
     def __init__(self, health):
         # Calls pygame's sprite class
@@ -543,6 +561,7 @@ class BugT4(pygame.sprite.Sprite):
         # Creates rectangle for the sprite and tracks coordinates
         self.rect = self.image.get_rect()
         self.health = health
+
     # Function that draws the Bug Type 1 onto the screen at given coordinates
     def draw(self, window):
         window.blit(self.image, (self.rect.x, self.rect.y))
@@ -555,7 +574,8 @@ class BugT4(pygame.sprite.Sprite):
         if self.rect.x == 800:
             self.kill()
 
-#-----[ BOSS SPRITE CLASS ]-----
+
+# -----[ BOSS SPRITE CLASS ]-----
 class Boss(pygame.sprite.Sprite):
     def __init__(self, health):
         # Calls pygame's sprite class
@@ -614,8 +634,6 @@ class Boss(pygame.sprite.Sprite):
                 asp.add(blaser)
                 blasers.add(blaser)
 
-
-
                 blaser = BOSSLaser()
                 blaser.rect.x = 450
                 blaser.rect.y = 180
@@ -625,13 +643,14 @@ class Boss(pygame.sprite.Sprite):
             else:
                 pass
 
-#-----[ BOSS LASER SPRITE CLASS ]-----
+
+# -----[ BOSS LASER SPRITE CLASS ]-----
 class BOSSLaser(pygame.sprite.Sprite):
     def __init__(self):
         # Calls pygame's sprite class
         super().__init__()
         # Creates a rectangle with width and height of 4 and fills it with predefined color RED
-        self.image = pygame.Surface([10,80])
+        self.image = pygame.Surface([10, 80])
         self.image.fill(CYAN)
         # Creates a rectangle (hitbox) for the sprite and tracks its coordinates
         self.rect = self.image.get_rect()
@@ -644,11 +663,12 @@ class BOSSLaser(pygame.sprite.Sprite):
         if self.rect.y > 400:
             self.kill()
 
-#=====[ MAIN GAME LOOP ]=====
+
+# =====[ MAIN GAME LOOP ]=====
 # COLIN: Here is where the game is run. It sets up the foundation of the pygame, then refers to several
 # classes and functions to display the pygame.
 
-#-----[ MAIN LOOP ]-----
+# -----[ MAIN LOOP ]-----
 def main():
     # creates a player sprites (but doesn't display them just yet)
     player1 = Player1(3)
@@ -667,7 +687,7 @@ def main():
     # -----[ DISPLAY FUNCTION ]-----
     def display(status):
 
-        #-----[ MAIN MENU ]-----
+        # -----[ MAIN MENU ]-----
         if status["p1alive"] == 0 and status["start"] == 0:
             # Draw background
             WIN.blit(BG, (0, 0))
@@ -683,7 +703,7 @@ def main():
             WIN.blit(text, textRect)
             WIN.blit(text2, (325, 185))
 
-            #-----[ MAIN MENU BUTTONS ]-----
+            # -----[ MAIN MENU BUTTONS ]-----
 
             # [SINGLE PLAYER BUTTON]
             # Blit it on screen, default color, x = 400, y = 150, w = 150, h = 40
@@ -746,7 +766,7 @@ def main():
             # QUIT TEXT
             WIN.blit(quit_text, (WIDTH / 2 + 40, 250 + 6))
 
-        #-----[ GAME PROGRESSION ]-----
+        # -----[ GAME PROGRESSION ]-----
         # SOLO:
         if status["coop"] == 0:
             if status["p1alive"] == 1 and status["start"] == 1:
@@ -757,7 +777,7 @@ def main():
                 if 1200 < status["counter"] < 1800:
                     WIN.blit(BG2, (0, 0))
                 if status["counter"] > 1800:
-                    WIN.blit(BG3, (0,0))
+                    WIN.blit(BG3, (0, 0))
         # CO-OP:
         if status["coop"] == 1:
             if status["p1alive"] == 1 or status["p2alive"] == 1 and status["start"] == 1:
@@ -770,7 +790,7 @@ def main():
                 if status["counter"] > 1800:
                     WIN.blit(BG3, (0, 0))
 
-        #-----[ GAME OVER ]-----
+        # -----[ GAME OVER ]-----
         # SOLO LOSS!:
         if status["coop"] == 0:
             # PLAYER LOSES:
@@ -794,10 +814,10 @@ def main():
                 # Draw text on window
                 WIN.blit(text, textRect)
 
-                score = font.render(" SCORE: {}".format(status["points"]),True, RED)
+                score = font.render(" SCORE: {}".format(status["points"]), True, RED)
                 scoreRect = score.get_rect()
-                scoreRect.center = (400,250)
-                WIN.blit(score,scoreRect)
+                scoreRect.center = (400, 250)
+                WIN.blit(score, scoreRect)
 
                 # -----[ QUIT TO MAIN MENU BUTTON ]-----
                 # Blit it on screen, default color, x = 400, y = 200, w = 140, h = 40
@@ -841,10 +861,10 @@ def main():
                 # Draw text on window
                 WIN.blit(text, textRect)
 
-                score = font.render(" SCORE: {}".format(status["points"]),True, RED)
+                score = font.render(" SCORE: {}".format(status["points"]), True, RED)
                 scoreRect = score.get_rect()
-                scoreRect.center = (400,250)
-                WIN.blit(score,scoreRect)
+                scoreRect.center = (400, 250)
+                WIN.blit(score, scoreRect)
 
                 # -----[ QUIT TO MAIN MENU BUTTON ]-----
                 # Blit it on screen, default color, x = 400, y = 200, w = 140, h = 40
@@ -977,9 +997,8 @@ def main():
         # Updates the window
         pygame.display.update()
 
-        #-----[ SPAWNING FUNCTION ]-----
+        # -----[ SPAWNING FUNCTION ]-----
         # Uses pygame's sprite groups to create waves of enemies
-
 
         # This function is called immediately upon game's launch. After, conditionals will run the game
         def spawn():
@@ -1098,7 +1117,7 @@ def main():
                     b2.rect.y = -100 * f
                     f += 1
 
-            #(BACKGROUND CHANGE)
+            # (BACKGROUND CHANGE)
             # WAVE 4: ( 11 BT3's, 10 BT4's, 42 BT1's) 63 TOTAL
             if status["counter"] == 1200:
                 # Bug Type 3's
@@ -1118,7 +1137,6 @@ def main():
                         b3.rect.x = 760
                     # Set  (off screen)
                     b3.rect.y = -800
-
 
                 # Bug Type 1's
                 # Incrementer for space between sprites
@@ -1253,7 +1271,7 @@ def main():
                     q += 1
                     if b4.rect.y == 200 or b4.rect.y == 240:
                         b4.kill()
-                    
+
             # BOSS WAVE
             if status["counter"] == 2100:
                 player1.rect.x = 370
@@ -1285,7 +1303,7 @@ def main():
         # Calls the function to spawn the enemies
         spawn()
 
-    #-----[ MUSIC FUNCTION ]-----
+    # -----[ MUSIC FUNCTION ]-----
     def music():
         MUSIC_FILE = ("game_music.mp3")
         pygame.mixer.init()
@@ -1295,39 +1313,38 @@ def main():
     # Calls the music function
     music()
 
-    #-----[ GAME LOGIC ]-----
+    # -----[ GAME LOGIC ]-----
     # Game loop for key controls, sprite collision, and calling earlier functions
     while run:
 
         # tracks mouse
         mouse = pygame.mouse.get_pos()
 
-        #-----[ TROUBLESHOOTING TEXTS ]-----
+        # -----[ TROUBLESHOOTING TEXTS ]-----
         print(status["counter"])
-        #print(status["coop"])
-        #print(mouse)
-        #print(status["difficulty"])
-        #print("POINTS: {}".format(status["points"]))
-        #print("HEALTH: {}".format(player1.health))
-        #print("HEALTH: {}".format(player2.health))
-        #print("P1: {}".format(status["p1alive"]))
-        #print("P2: {}".format(status["p2alive"]))
-        #print(len(blasers))
-        #print(len(ship))
-        #print("STATUS: {}".format(status["difficulty"]))
-
+        # print(status["coop"])
+        # print(mouse)
+        # print(status["difficulty"])
+        # print("POINTS: {}".format(status["points"]))
+        # print("HEALTH: {}".format(player1.health))
+        # print("HEALTH: {}".format(player2.health))
+        # print("P1: {}".format(status["p1alive"]))
+        # print("P2: {}".format(status["p2alive"]))
+        # print(len(blasers))
+        # print(len(ship))
+        # print("STATUS: {}".format(status["difficulty"]))
 
         # Sets the game to reset at the desired frames per second
         clock.tick(FPS)
 
-        #-----[ GAME EVENTS ]-----
+        # -----[ GAME EVENTS ]-----
         # Player closes window
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 # Run is set to False; main loop stops
                 run = False
 
-            #-----[ PLAYERS LASER FIRE BUTTON ]-----
+            # -----[ PLAYERS LASER FIRE BUTTON ]-----
             if event.type == pygame.KEYDOWN:
 
                 # PLAYER 1 FIRING:
@@ -1376,7 +1393,7 @@ def main():
                     b1.kill()
                     status["points"] += 1
 
-        #-----[ SHIP LASERS / BUG 2 COLLISION ]-----
+        # -----[ SHIP LASERS / BUG 2 COLLISION ]-----
         # Create a list that removes laser and enemy once they collide
         # The boolean, if set to true, removes both sprites.
         for laser in lasers:
@@ -1447,7 +1464,7 @@ def main():
                     status["bossdead"] = 1
                     status["points"] += 100
 
-        #-----[ BUG'S LASERS / PLAYER(S) COLLISION ]-----
+        # -----[ BUG'S LASERS / PLAYER(S) COLLISION ]-----
         # SOLO:
         if status["coop"] == 0:
             # Collision between the Bug's lasers and the player
@@ -1523,7 +1540,7 @@ def main():
                         # Input small delay for reaction time
                         pygame.time.delay(100)
 
-        #-----[ BUG TYPE 1 / PLAYER SHIP COLLISION ]------
+        # -----[ BUG TYPE 1 / PLAYER SHIP COLLISION ]------
         # SOLO:
         if status["coop"] == 0:
             for b1 in bug1:
@@ -1592,7 +1609,7 @@ def main():
                         player1.rect.x = 400
                         player1.rect.y = 360
 
-        #-----[ BUG TYPE 2 / PLAYER SHIP COLLISION ]------
+        # -----[ BUG TYPE 2 / PLAYER SHIP COLLISION ]------
         # SOLO:
         if status["coop"] == 0:
             for b2 in bug2:
@@ -1667,7 +1684,7 @@ def main():
                         b2.kill()
                         status["points"] += 2
 
-        #-----[ BUG TYPE 3 / PLAYER SHIP COLLISION ]------
+        # -----[ BUG TYPE 3 / PLAYER SHIP COLLISION ]------
         # SOLO
         if status["coop"] == 0:
             for b3 in bug3:
@@ -1734,7 +1751,7 @@ def main():
                         player2.rect.x = 400
                         player2.rect.y = 320
 
-        #-----[ BUG TYPE 4 / PLAYER SHIP COLLISION ]------
+        # -----[ BUG TYPE 4 / PLAYER SHIP COLLISION ]------
         # SOLO:
         if status["coop"] == 0:
             for b4 in bug4:
@@ -1871,7 +1888,7 @@ def main():
                         boss.kill()
                         status["points"] += 100
 
-        #-----[ PLAYER MOVEMENT ]-----
+        # -----[ PLAYER MOVEMENT ]-----
         # SOLO:
         if status["coop"] == 0:
             if status["p1alive"] == 1 and status["start"] == 1:
@@ -1883,7 +1900,7 @@ def main():
             if status["p2alive"] == 1 and status["start"] == 1:
                 player2.move()
 
-        #-----[ TIMER/ITERATOR/INCREMENTER/COUNTER ]-----
+        # -----[ TIMER/ITERATOR/INCREMENTER/COUNTER ]-----
         # A constantly iterating variable in place of a time module
         # spawns enemies and controls level progression
         # SOLO
@@ -1898,26 +1915,53 @@ def main():
         if status["coop"] == 1:
             # If both players are alive, increment the counter
             if (status["p1alive"] == 1 and status["p2alive"] == 1 and status["start"] == 1):
-                    status["counter"] += 1
+                status["counter"] += 1
             # If one player is alive, increment the counter
             if (status["p1alive"] == 1 and status["p2alive"] == 0 and status["start"] == 1):
-                    status["counter"] += 1
+                status["counter"] += 1
             if (status["p1alive"] == 0 and status["p2alive"] == 1 and status["start"] == 1):
-                    status["counter"] += 1
+                status["counter"] += 1
             # If none of the players are alive, set counter == 0 (So game can start again)
             if (status["p1alive"] == 0 and status["p2alive"] == 0 and status["start"] == 1):
-                    status["counter"] == 0
-
+                status["counter"] == 0
 
         # Makes sure player has health at beginning of game
         if status["counter"] == 0:
             player1.health = 3
             player2.health = 3
 
+        # LEDS
+        if player2.health == 3:
+            GPIO.output(leds, True)
+            # print("LED ON")
+        if player2.health == 2:
+            GPIO.output(13, False)
+            GPIO.output((16, 17), True)
+        if player2.health == 1:
+            GPIO.output((13, 16), False)
+            GPIO.output(17, True)
+        if status["p2alive"] == 0:
+            GPIO.output(leds, False)
+            # print("LED OFF")
+
+        # LEDS2
+        if player1.health == 3:
+            GPIO.output(leds2, True)
+            # print("LED ON")
+        if player1.health == 2:
+            GPIO.output(4, False)
+            GPIO.output((5, 6), True)
+        if player1.health == 1:
+            GPIO.output((4, 5), False)
+            GPIO.output(6, True)
+        if status["p1alive"] == 0:
+            GPIO.output(leds2, False)
+            # print("LED OFF")
 
         # While the game is running, call the display function
         display(status)
 
-#=====[ LAUNCH GAME ]=====
+
+# =====[ LAUNCH GAME ]=====
 # Calls main loop
 main()
