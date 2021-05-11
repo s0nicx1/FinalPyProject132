@@ -1308,7 +1308,7 @@ def main():
         MUSIC_FILE = ("game_music.mp3")
         pygame.mixer.init()
         pygame.mixer.music.load(MUSIC_FILE)
-        pygame.mixer.music.play()
+        pygame.mixer.music.play(-1)
 
     # Calls the music function
     music()
