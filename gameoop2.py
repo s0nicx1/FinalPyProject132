@@ -85,15 +85,13 @@ BG = pygame.image.load("space.jpg")
 # This is a good background. use it
 BG2 = pygame.image.load("space4.png")
 BG3 = pygame.image.load("N2D Space.png")
-#BG3 = pygame.image.load("space4.png")
 
-# Grab music for game audio
-MUSIC = pygame.mixer.music.load("game_music.mp3")
 
 # Grabs sound for laser fire
 FIRE = pygame.mixer.Sound("laserfire.wav")
 HIT = pygame.mixer.Sound("Explosion.wav")
 BUZZ = pygame.mixer.Sound("buzz.wav")
+DEATH = pygame.mixer.Sound("death.wav")
 
 #=====[ VARIABLES AND LISTS ]=====
 # The following constant variables represent RGB values for colors
@@ -120,13 +118,18 @@ font = pygame.font.Font('8-BitMadness.ttf', 40)
 one_player_text = font.render('1-Player', True, text_color)
 # 2-Player text
 two_player_text = font.render('2-Player', True, text_color)
-
 # QUIT text
 quit_text = font.render('quit', True, text_color)
 
 # This list represents the amount of time the Bug Type 2 has fired, and its limits can be adjusted accordingly to match
 # level difficulty
 b2lasers = []
+# These lists keep track with how many times the boss has fired from each blaster (going left to right) and resets
+# itself in the Boss sprite class so it can fire, pause, fire again.
+bossblaster1 = []
+bossblaster2 = []
+bossblaster3 = []
+bossblaster4 = []
 
 # This constant variable represents the amount of pixels Bug Type 1's travel per frame.
 # CAN BE ADJUSTED LATER FOR DIFFICULTY
@@ -582,6 +585,17 @@ class Boss(pygame.sprite.Sprite):
 
     # Update the sprite's movement
     def update(self):
+        # Extra Audio:
+        # Each time the boss's image updates, play death sound for audio impact
+        if self.health == 30:
+            pygame.mixer.Sound.play(DEATH)
+        if self.health == 20:
+            pygame.mixer.Sound.play(DEATH)
+        if self.health == 10:
+            pygame.mixer.Sound.play(DEATH)
+
+        # Boss Image:
+        # If the boss's health ranges between certain numbers, update the image so damage is visible
         if 30 < self.health <= 40:
             self.image = self.images[0]
         if 20 < self.health <= 30:
@@ -590,40 +604,75 @@ class Boss(pygame.sprite.Sprite):
             self.image = self.images[2]
         if 0 < self.health <= 10:
             self.image = self.images[3]
+
+        # Boss Movement:
         # Go down the screen until y coordinate == 50
         if self.rect.y != 50:
             self.rect.y += 1
+
+        # Boss Firing:
         if self.rect.y == 50:
+
+            # If health is above 20 (screen left wing visible), fire blasters 1 and 2
             if self.health > 20:
-                blaser = BOSSLaser()
-                blaser.rect.x = 265
-                blaser.rect.y = 180
-                asp.add(blaser)
-                blasers.add(blaser)
+                # BLASTER 1:
+                # Fire until list reaches MINIMUM length
+                if len(bossblaster1) < 110:
+                    blaser = BOSSLaser()
+                    blaser.rect.x = 265
+                    blaser.rect.y = 180
+                    asp.add(blaser)
+                    blasers.add(blaser)
+                    # Add to the list each time blaster is fired
+                    bossblaster1.append("1")
+                # Once past the appropriate length, keep adding to the list
+                if 110 <= len(bossblaster1) < 180:
+                    bossblaster1.append("1")
+                # If list reaches MAXIMUM length, clear all the elements of the list
+                if len(bossblaster1) == 180:
+                    bossblaster1.clear()
 
-                blaser = BOSSLaser()
-                blaser.rect.x = 345
-                blaser.rect.y = 180
-                asp.add(blaser)
-                blasers.add(blaser)
+                # BLASTER 2:
+                if len(bossblaster2) < 80:
+                    blaser = BOSSLaser()
+                    blaser.rect.x = 345
+                    blaser.rect.y = 180
+                    asp.add(blaser)
+                    blasers.add(blaser)
+                    bossblaster2.append("1")
+                if 80 <= len(bossblaster2) < 150:
+                    bossblaster2.append("1")
+                if len(bossblaster2) == 150:
+                    bossblaster2.clear()
 
+
+            # If health is above 10 (screen right wing visible), fire blasters 3 and 4
             if self.health > 10:
-                blaser = BOSSLaser()
-                blaser.rect.x = 525
-                blaser.rect.y = 180
-                asp.add(blaser)
-                blasers.add(blaser)
+                # BLASTER 3:
+                if len(bossblaster3) < 110:
+                    blaser = BOSSLaser()
+                    blaser.rect.x = 525
+                    blaser.rect.y = 180
+                    asp.add(blaser)
+                    blasers.add(blaser)
+                    bossblaster3.append("1")
+                if 110 <= len(bossblaster3) < 180:
+                    bossblaster3.append("1")
+                if len(bossblaster3) == 180:
+                    bossblaster3.clear()
 
-
-
-                blaser = BOSSLaser()
-                blaser.rect.x = 450
-                blaser.rect.y = 180
-                asp.add(blaser)
-                blasers.add(blaser)
-
-            else:
-                pass
+                # BLASTER 4:
+                if len(bossblaster4) < 80:
+                    blaser = BOSSLaser()
+                    blaser.rect.x = 450
+                    blaser.rect.y = 180
+                    asp.add(blaser)
+                    blasers.add(blaser)
+                    bossblaster4.append("1")
+                if 80 <= len(bossblaster4) < 150:
+                    bossblaster4.append("1")
+                if len(bossblaster4) == 150:
+                    bossblaster4.clear()
 
 #-----[ BOSS LASER SPRITE CLASS ]-----
 class BOSSLaser(pygame.sprite.Sprite):
@@ -984,7 +1033,7 @@ def main():
         # This function is called immediately upon game's launch. After, conditionals will run the game
         def spawn():
 
-            # Wave 1: (25 Bug Type 1's) 25 TOTAL
+            # WAVE 1: (25 Bug Type 1's) 25 TOTAL
             if status["counter"] == 3:
 
                 # Incrementer for space between sprites
@@ -1098,7 +1147,7 @@ def main():
                     b2.rect.y = -100 * f
                     f += 1
 
-            #(BACKGROUND CHANGE)
+            # BACKGROUND CHANGE at 1200
             # WAVE 4: ( 11 BT3's, 10 BT4's, 42 BT1's) 63 TOTAL
             if status["counter"] == 1200:
                 # Bug Type 3's
@@ -1165,7 +1214,7 @@ def main():
                     asp.add(b1)
                     bug1.add(b1)
                     b1.image = b1.images[3]
-                    # set its initial coordinates to (-80,0)
+
                     # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug's x
                     b1.rect.x = 800
                     b1.rect.x += 10 * m
@@ -1189,6 +1238,7 @@ def main():
                     b1.rect.y = 0
                     s += 1
 
+            # WAVE 5: ( 32 BT4's) 32 TOTAL
             if status["counter"] == 1600:
                 # Bug Type 4's
                 # Incrementer for space between sprites
@@ -1253,17 +1303,71 @@ def main():
                     q += 1
                     if b4.rect.y == 200 or b4.rect.y == 240:
                         b4.kill()
-                    
-            # BOSS WAVE
-            if status["counter"] == 2100:
-                player1.rect.x = 370
-                player1.rect.y = 360
 
-                boss = Boss(50)
+            # BACKGROUND CHANGE AT 1800
+            # WAVE 6:
+            if status["counter"] == 1800:
+                # Bug Type 1's
+                # Incrementer for space between sprites
+                b = 1
+                # Spawn 20 enemies
+                for i in range(1, 21):
+                    # create a bug 1 type
+                    b1 = BugT1(1)
+                    # add it to all appropriate lists
+                    asp.add(b1)
+                    bug1.add(b1)
+                    b1.image = b1.images[2]
+                    # set its initial coordinates to (-80,0)
+                    # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug's x
+                    b1.rect.x = 800
+                    b1.rect.x += 10 * b
+                    b1.rect.y = 40
+                    b += 1
+
+            # BOSS WAVE
+            if status["counter"] == 2000:
+
+                boss = Boss(65)
                 asp.add(boss)
                 boss1.add(boss)
                 boss.rect.x = 250
                 boss.rect.y = 0
+
+                # Bug Type 1's
+                # Incrementer for space between sprites
+                b = 1
+                # Spawn 20 enemies
+                for i in range(1, 21):
+                    # create a bug 1 type
+                    b1 = BugT1(1)
+                    # add it to all appropriate lists
+                    asp.add(b1)
+                    bug1.add(b1)
+                    b1.image = b1.images[2]
+                    # set its initial coordinates to (-80,0)
+                    # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug's x
+                    b1.rect.x = -10 * b
+                    b1.rect.y = 0
+                    b += 1
+
+                # Bug Type 1's
+                # Incrementer for space between sprites
+                b = 1
+                # Spawn 20 enemies
+                for i in range(1, 21):
+                    # create a bug 1 type
+                    b1 = BugT1(1)
+                    # add it to all appropriate lists
+                    asp.add(b1)
+                    bug1.add(b1)
+                    b1.image = b1.images[2]
+                    # set its initial coordinates to (-80,0)
+                    # Everytime a bug gets spawned, b is incremented by 1, so 80 pixels of space is made between each bug's x
+                    b1.rect.x == 800
+                    b1.rect.x += 10 * b
+                    b1.rect.y = 0
+                    b += 1
 
                 for i in range(1, 11):
                     # Create Bug Type 3's
@@ -1290,7 +1394,7 @@ def main():
         MUSIC_FILE = ("game_music.mp3")
         pygame.mixer.init()
         pygame.mixer.music.load(MUSIC_FILE)
-        pygame.mixer.music.play()
+        pygame.mixer.music.play(-1)
 
     # Calls the music function
     music()
@@ -1303,7 +1407,7 @@ def main():
         mouse = pygame.mouse.get_pos()
 
         #-----[ TROUBLESHOOTING TEXTS ]-----
-        print(status["counter"])
+        #print(status["counter"])
         #print(status["coop"])
         #print(mouse)
         #print(status["difficulty"])
@@ -1442,6 +1546,7 @@ def main():
                 laser.kill()
                 # If player has no health remaining
                 if boss.health <= 0:
+                    pygame.mixer.Sound.play(DEATH)
                     # Remove player from everything
                     boss.kill()
                     status["bossdead"] = 1
@@ -1822,6 +1927,7 @@ def main():
                         player1.rect.x = 400
                         player1.rect.y = 360
                     if boss.health <= 0:
+                        pygame.mixer.Sound.play(DEATH)
                         boss.kill()
                         status["points"] += 100
         # CO-OP:
@@ -1846,6 +1952,7 @@ def main():
                         player1.rect.x = 400
                         player1.rect.y = 360
                     if boss.health <= 0:
+                        pygame.mixer.Sound.play(DEATH)
                         boss.kill()
                         status["points"] += 100
             for boss in boss1:
@@ -1907,7 +2014,6 @@ def main():
             # If none of the players are alive, set counter == 0 (So game can start again)
             if (status["p1alive"] == 0 and status["p2alive"] == 0 and status["start"] == 1):
                     status["counter"] == 0
-
 
         # Makes sure player has health at beginning of game
         if status["counter"] == 0:
