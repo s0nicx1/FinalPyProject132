@@ -4,6 +4,7 @@
 # Import pygame and random module
 import pygame
 import random
+import RPi.GPIO as GPIO
 
 # Initialize the pygame module
 pygame.init()
