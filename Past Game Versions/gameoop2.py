@@ -1386,6 +1386,8 @@ def main():
                     # Set  (off screen)
                     b3.rect.y = -800
 
+
+
         # Calls the function to spawn the enemies
         spawn()
 
@@ -1433,7 +1435,6 @@ def main():
 
             #-----[ PLAYERS LASER FIRE BUTTON ]-----
             if event.type == pygame.KEYDOWN:
-
                 # PLAYER 1 FIRING:
                 # If the player hits the fire button and has health remaining
                 if event.key == pygame.K_LCTRL and status["p1alive"] == 1:
@@ -1929,6 +1930,7 @@ def main():
                     if boss.health <= 0:
                         pygame.mixer.Sound.play(DEATH)
                         boss.kill()
+                        status["bossdead"] = 1
                         status["points"] += 100
         # CO-OP:
         if status["coop"] == 1:
@@ -1954,6 +1956,7 @@ def main():
                     if boss.health <= 0:
                         pygame.mixer.Sound.play(DEATH)
                         boss.kill()
+                        status["bossdead"] = 1
                         status["points"] += 100
             for boss in boss1:
                 crash2 = pygame.sprite.spritecollide(boss, ship2, False)
@@ -1976,6 +1979,7 @@ def main():
                         player2.rect.y = 360
                     if boss.health <= 0:
                         boss.kill()
+                        status["bossdead"] = 1
                         status["points"] += 100
 
         #-----[ PLAYER MOVEMENT ]-----
@@ -2017,7 +2021,7 @@ def main():
 
         # Makes sure player has health at beginning of game
         if status["counter"] == 0:
-            player1.health = 3
+            player1.health = 3000
             player2.health = 3
 
 

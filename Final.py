@@ -1,5 +1,4 @@
-""" THIS VERSION IS FOR DEVELOPMENT PURPOSES"""
-""" THE FINAL, RPi-COMPATIBLE VERSION IS gameoopRPi.py"""
+
 
 # Import pygame and random module
 import pygame
